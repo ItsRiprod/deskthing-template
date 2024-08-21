@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.8.0",
   "type": "module",
+  "description": "The DeskThing template for building DeskThing Apps",
   "main": "dist/index.js",
   "dependencies": {
     "chalk": "^5.3.0",
@@ -26,5 +27,15 @@
     "tailwindcss",
     "template",
     "deskthing"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ItsRiprod/deskthing-template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ItsRiprod/deskthing-template/issues"
+  },
+  "homepage": "https://github.com/ItsRiprod/deskthing-template#readme",
+  "author": "Riprod",
+  "license": "MIT"
 }

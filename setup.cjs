@@ -74,7 +74,7 @@ async function init() {
       }
       console.log(chalk.green('Dependencies installed successfully.'));
       console.log(stdout);
-      console.log(chalk.greenBright('Now do ') + chalk.bgBlack.bold('cd ${projectName}') + chalk.greenBright(' and start developing!'));
+      console.log(chalk.greenBright('Now do ') + chalk.bgBlack.bold(`cd ${projectName}`) + chalk.greenBright(' and start developing!'));
     });
   } catch (error) {
     console.error(chalk.red('Error creating template:', error));
