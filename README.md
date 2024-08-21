@@ -1,50 +1,53 @@
-# React + TypeScript + Vite
+# Deskthing-Template
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
 
-Currently, two official plugins are available:
+This template provides a starting point for creating an app for the DeskThingServer application. It includes a basic project structure and configuration to help you get started quickly.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Prerequisites
 
-## Expanding the ESLint configuration
+- Node.js (v14 or later)
+- npm (v6 or later)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Getting Started
 
-- Configure the top-level `parserOptions` property like this:
+1. Initialize this repository:
+   
+   ```sh
+   npm create DeskThing@latest
+   ```
+   
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+2. Follow the setup and step into your app:
+   
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+3. Start the development server:
+   
+   npm run dev
+   
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## Project Structure
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- `src/`: Contains the React application source code. This is the webpage
+- `public/`: Static assets and HTML template. This includes your manifest.json
+- `server/`: Your backend code that runs the core of your app
+
+## Available Scripts
+
+- `npm run dev`: Starts the development server
+- `npm run build`: Builds the app into /dist where you can zip the files and load them into the DeskThingServer
+
+## Customizing the Template
+
+1. Update the `package.json` or `/public/manifest.json` files with your project details if they change
+2. Modify the `index.html` file to change the app title and meta information
+3. Start building your React components in the `src/components/` directory
+4. Customize your server in `server/index.ts`
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
