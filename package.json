@@ -1,0 +1,30 @@
+{
+  "name": "deskthing-template",
+  "private": true,
+  "version": "0.8.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "ejs": "^3.1.10",
+    "ora": "^8.0.1"
+  },
+  "bin": {
+    "deskthing-template": "setup.cjs"
+  },
+  "scripts": {
+    "init": "node setup.cjs"
+  },
+  "files": [
+    "public",
+    "setup.js",
+    "template"
+  ],
+  "keywords": [
+    "vite",
+    "react",
+    "tailwindcss",
+    "template",
+    "deskthing"
+  ]
+}
