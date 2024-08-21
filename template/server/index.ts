@@ -15,14 +15,14 @@ const start = async () => {
     // This is how to add settings (implementation may vary)
     if (!Data?.settings?.theme) {
         DeskThing.addSettings({
-          "theme": { label: "Auto Switch View", value: 'dark', options: [{ label: 'Dark Theme', value: 'dark' }, { label: 'Light Theme', value: 'light' }] },
+          "theme": { label: "Theme Choice", value: 'dark', options: [{ label: 'Dark Theme', value: 'dark' }, { label: 'Light Theme', value: 'light' }] },
         })
 
         // This will make Data.settings.theme.value equal whatever the user selects
       }
 
-    // Getting data from the user
-    if (!Data?.client_id || !Data?.client_secret) {
+    // Getting data from the user (Ensure these match)
+    if (!Data?.user_input || !Data?.second_user_input) {
         const requestScopes = {
           'user_input': {
             'value': '',

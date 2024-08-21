@@ -51,3 +51,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+# How to use
+
+For instructions on setting up and running the client (webpage), refer to the deskthing-client tool
+https://github.com/ItsRiprod/deskthing-app-client
+
+For instructions on setting up and running the server, refer to the deskthing-server tool
+https://github.com/ItsRiprod/deskthing-app-server
