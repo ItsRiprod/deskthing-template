@@ -1,7 +1,7 @@
 {
   "name": "create-deskthing",
   "private": false,
-  "version": "0.8.1",
+  "version": "0.8.11",
   "type": "module",
   "description": "The DeskThing template for building DeskThing Apps",
   "main": "dist/index.js",
@@ -14,7 +14,8 @@
     "deskthing-template": "setup.cjs"
   },
   "scripts": {
-    "init": "node setup.cjs"
+    "init": "node setup.cjs",
+    "build": "esbuild setup_script.cjs --outfile=setup.cjs"
   },
   "files": [
     "public",
