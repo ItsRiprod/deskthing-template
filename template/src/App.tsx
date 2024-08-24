@@ -10,7 +10,11 @@ const App: React.FC = () => {
             console.log('Received data from the server!')
             console.log(data)
         }
-        deskthing.on('yourAppID', onAppData)
+        const removeListener = deskthing.on('yourAppID', onAppData)
+
+        return () => {
+            removeListener()
+        }
     })
 
     return (
