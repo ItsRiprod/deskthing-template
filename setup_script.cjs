@@ -77,7 +77,7 @@ async function init() {
       console.log(chalk.greenBright('Now do ') + chalk.bgBlack.bold(`cd ${projectName}`) + chalk.greenBright(' and start developing!'));
     });
   } catch (error) {
-    console.error(chalk.red('Error creating template:', error));
+    console.error('Error creating template:', error);
   } finally {
     rl.close();
   }

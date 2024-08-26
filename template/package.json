@@ -1,13 +1,13 @@
 {
   "name": "<%= projectName %>",
   "private": true,
-  "version": "0.8.3",
+  "version": "0.8.7",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build && npm run build-server",
-    "build-server": "tsc --project tsconfig.server.json",
+    "build-server": "esbuild server/index.ts --bundle --platform=node --outdir=dist/server",
     "setup": "node setup.js",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -31,6 +31,7 @@
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1"
+    "vite": "^5.4.1",
+    "esbuild": "^0.19.2"
   }
 }

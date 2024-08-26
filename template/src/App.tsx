@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { DeskThing } from 'deskthing-client'
-import { SocketData } from 'deskthing-server'
+import { SocketData } from 'deskthing-client/dist/types'
 
 const App: React.FC = () => {
     const deskthing = DeskThing.getInstance()
