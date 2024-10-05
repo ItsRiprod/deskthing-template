@@ -14,7 +14,7 @@ This template provides a starting point for creating an app for the DeskThingSer
 1. Initialize this repository:
    
    ```sh
-   npm create DeskThing@latest
+   npm create deskthing@latest
    ```
    
 
