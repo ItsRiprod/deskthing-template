@@ -1,8 +1,14 @@
 import { DeskThing as DK } from 'deskthing-server';
+// Doing this is required in order for the server to link with DeskThing
 const DeskThing = DK.getInstance();
-export { DeskThing } // Required export of this exact name for the server to connect
+export { DeskThing }
 
+// End of required code
+
+// This is triggered at the end of this file with the on('start') listener. It runs when the DeskThing starts your app. It serves as the entrypoint for your app
 const start = async () => {
+
+    // This is just one of the ways of synchronizing your data with the server. It waits for the server to have more data and saves it to the Data object here.
     let Data = await DeskThing.getData()
     DeskThing.on('data', (newData) => {
         // Syncs the data with the server
@@ -12,7 +18,7 @@ const start = async () => {
 
     // Template Items
 
-    // This is how to add settings (implementation may vary)
+    // This is how to add settings. You need to pass the "settings" object to the AddSettings() function
     if (!Data?.settings?.theme) {
         DeskThing.addSettings({
           "theme": { label: "Theme Choice", value: 'dark', options: [{ label: 'Dark Theme', value: 'dark' }, { label: 'Light Theme', value: 'light' }] },

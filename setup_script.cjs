@@ -25,7 +25,7 @@ async function init() {
     console.log(chalk.cyanBright.bold(`Welcome to DeskThing v${version} `));
     console.log(chalk.greenBright('Setting up your project... '));
     console.log();
-    const projectName = await askQuestion('App ID: ');
+    const projectName = await askQuestion('Enter App ID (lowercase, no spaces): ');
     const destDir = path.join(process.cwd(), projectName);
 
     // 1. Copy the entire template directory
@@ -39,13 +39,14 @@ async function init() {
       isWebApp: true,
       isLocalApp: false,
       requires: (await askQuestion('Comma-separated list of required app IDs (e.g., utility,local,spotify): ')).split(',').map(str => str.trim()),
-      label: await askQuestion('App Label (display name): '),
+      label: await askQuestion('App Label (Display Name): '),
       version: version, // You can customize this or get it from package.json
-      description: await askQuestion('Description: '),
-      author: await askQuestion('Author: '),
+      version_code: await askQuestion('App Version (number like 900 for v0.9.0): '),
+      description: await askQuestion('App Description: '),
+      author: await askQuestion('App Author: '),
       platforms: await getPlatforms(),
-      homepage: await askQuestion('Homepage Link: '),
-      repository: await askQuestion('Repository Link: '),
+      homepage: await askQuestion('Homepage Link (can be blank): '),
+      repository: await askQuestion('Github Repository Link (can be blank): '),
     };
 
     // 3. Create and write the manifest.json file
@@ -74,7 +75,7 @@ async function init() {
       }
       console.log(chalk.green('Dependencies installed successfully.'));
       console.log(stdout);
-      console.log(chalk.greenBright('Now do ') + chalk.bgBlack.bold(`cd ${projectName}`) + chalk.greenBright(' and start developing!'));
+      console.log(chalk.greenBright('Now enter ') + chalk.bgBlack.bold(`cd ${projectName}`) + chalk.greenBright(' and ') + chalk.bgBlack.bold(`npm run dev`) + chalk.greenBright(' to get started!'));
     });
   } catch (error) {
     console.error('Error creating template:', error);
