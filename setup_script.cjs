@@ -21,6 +21,7 @@ async function init() {
     const { default: chalk } = await import('chalk');
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
     const version = packageJson.version;
+    const version_code = packageJson.version_code;
 
     console.log(chalk.cyanBright.bold(`Welcome to DeskThing v${version} `));
     console.log(chalk.greenBright('Setting up your project... '));
@@ -41,7 +42,9 @@ async function init() {
       requires: (await askQuestion('Comma-separated list of required app IDs (e.g., utility,local,spotify): ')).split(',').map(str => str.trim()),
       label: await askQuestion('App Label (Display Name): '),
       version: version, // You can customize this or get it from package.json
-      version_code: await askQuestion('App Version (number like 900 for v0.9.0): '),
+      version_code: await askQuestion('App Version Number (number like 9.0 for v0.9.0): '),
+      compatible_server: (await askQuestion('Server Compatibility Range ("7.3,9" for v0.7.3 to v0.9.*): ') || version_code).split(',').map(str => str.trim()),
+      compatible_client: (await askQuestion('Client Compatibility Range ("7,9.2" for v0.7.* to v0.9.2): ') || version_code).split(',').map(str => str.trim()),
       description: await askQuestion('App Description: '),
       author: await askQuestion('App Author: '),
       platforms: await getPlatforms(),

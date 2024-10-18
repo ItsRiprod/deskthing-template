@@ -5,7 +5,10 @@
     "isLocalApp": false,
     "requires": [],
     "label": "",
-    "version": "v0.8.8",
+    "version": "v0.9.0",
+    "version_code": 9.0,
+    "compatible_server": [9],
+    "compatible_client": [9],
     "description": "",
     "author": "",
     "platforms": [
