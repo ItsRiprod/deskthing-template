@@ -32,38 +32,37 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
-// ../../../../../../node_modules/universalify/index.js
+// node_modules/universalify/index.js
 var require_universalify = __commonJS({
-  "../../../../../../node_modules/universalify/index.js"(exports2) {
+  "node_modules/universalify/index.js"(exports2) {
     "use strict";
     exports2.fromCallback = function(fn) {
-      return Object.defineProperty(function() {
-        if (typeof arguments[arguments.length - 1] === "function") fn.apply(this, arguments);
+      return Object.defineProperty(function(...args) {
+        if (typeof args[args.length - 1] === "function") fn.apply(this, args);
         else {
           return new Promise((resolve, reject) => {
-            arguments[arguments.length] = (err, res) => {
-              if (err) return reject(err);
-              resolve(res);
-            };
-            arguments.length++;
-            fn.apply(this, arguments);
+            args.push((err, res) => err != null ? reject(err) : resolve(res));
+            fn.apply(this, args);
           });
         }
       }, "name", { value: fn.name });
     };
     exports2.fromPromise = function(fn) {
-      return Object.defineProperty(function() {
-        const cb = arguments[arguments.length - 1];
-        if (typeof cb !== "function") return fn.apply(this, arguments);
-        else fn.apply(this, arguments).then((r) => cb(null, r), cb);
+      return Object.defineProperty(function(...args) {
+        const cb = args[args.length - 1];
+        if (typeof cb !== "function") return fn.apply(this, args);
+        else {
+          args.pop();
+          fn.apply(this, args).then((r) => cb(null, r), cb);
+        }
       }, "name", { value: fn.name });
     };
   }
 });
 
-// ../../../../../../node_modules/graceful-fs/polyfills.js
+// node_modules/graceful-fs/polyfills.js
 var require_polyfills = __commonJS({
-  "../../../../../../node_modules/graceful-fs/polyfills.js"(exports2, module2) {
+  "node_modules/graceful-fs/polyfills.js"(exports2, module2) {
     var constants = require("constants");
     var origCwd = process.cwd;
     var cwd = null;
@@ -349,9 +348,9 @@ var require_polyfills = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/graceful-fs/legacy-streams.js
+// node_modules/graceful-fs/legacy-streams.js
 var require_legacy_streams = __commonJS({
-  "../../../../../../node_modules/graceful-fs/legacy-streams.js"(exports2, module2) {
+  "node_modules/graceful-fs/legacy-streams.js"(exports2, module2) {
     var Stream = require("stream").Stream;
     module2.exports = legacy;
     function legacy(fs2) {
@@ -445,9 +444,9 @@ var require_legacy_streams = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/graceful-fs/clone.js
+// node_modules/graceful-fs/clone.js
 var require_clone = __commonJS({
-  "../../../../../../node_modules/graceful-fs/clone.js"(exports2, module2) {
+  "node_modules/graceful-fs/clone.js"(exports2, module2) {
     "use strict";
     module2.exports = clone;
     var getPrototypeOf = Object.getPrototypeOf || function(obj) {
@@ -468,9 +467,9 @@ var require_clone = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/graceful-fs/graceful-fs.js
+// node_modules/graceful-fs/graceful-fs.js
 var require_graceful_fs = __commonJS({
-  "../../../../../../node_modules/graceful-fs/graceful-fs.js"(exports2, module2) {
+  "node_modules/graceful-fs/graceful-fs.js"(exports2, module2) {
     var fs2 = require("fs");
     var polyfills = require_polyfills();
     var legacy = require_legacy_streams();
@@ -838,9 +837,9 @@ var require_graceful_fs = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/fs/index.js
+// node_modules/fs-extra/lib/fs/index.js
 var require_fs = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/fs/index.js"(exports2) {
+  "node_modules/fs-extra/lib/fs/index.js"(exports2) {
     "use strict";
     var u = require_universalify().fromCallback;
     var fs2 = require_graceful_fs();
@@ -858,18 +857,20 @@ var require_fs = __commonJS({
       "fsync",
       "ftruncate",
       "futimes",
-      "lchown",
       "lchmod",
+      "lchown",
       "link",
       "lstat",
       "mkdir",
       "mkdtemp",
       "open",
-      "readFile",
+      "opendir",
       "readdir",
+      "readFile",
       "readlink",
       "realpath",
       "rename",
+      "rm",
       "rmdir",
       "stat",
       "symlink",
@@ -880,12 +881,7 @@ var require_fs = __commonJS({
     ].filter((key) => {
       return typeof fs2[key] === "function";
     });
-    Object.keys(fs2).forEach((key) => {
-      if (key === "promises") {
-        return;
-      }
-      exports2[key] = fs2[key];
-    });
+    Object.assign(exports2, fs2);
     api.forEach((method) => {
       exports2[method] = u(fs2[method]);
     });
@@ -919,350 +915,245 @@ var require_fs = __commonJS({
         });
       });
     };
+    exports2.readv = function(fd, buffers, ...args) {
+      if (typeof args[args.length - 1] === "function") {
+        return fs2.readv(fd, buffers, ...args);
+      }
+      return new Promise((resolve, reject) => {
+        fs2.readv(fd, buffers, ...args, (err, bytesRead, buffers2) => {
+          if (err) return reject(err);
+          resolve({ bytesRead, buffers: buffers2 });
+        });
+      });
+    };
+    exports2.writev = function(fd, buffers, ...args) {
+      if (typeof args[args.length - 1] === "function") {
+        return fs2.writev(fd, buffers, ...args);
+      }
+      return new Promise((resolve, reject) => {
+        fs2.writev(fd, buffers, ...args, (err, bytesWritten, buffers2) => {
+          if (err) return reject(err);
+          resolve({ bytesWritten, buffers: buffers2 });
+        });
+      });
+    };
     if (typeof fs2.realpath.native === "function") {
       exports2.realpath.native = u(fs2.realpath.native);
+    } else {
+      process.emitWarning(
+        "fs.realpath.native is not a function. Is fs being monkey-patched?",
+        "Warning",
+        "fs-extra-WARN0003"
+      );
     }
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/mkdirs/win32.js
-var require_win32 = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/mkdirs/win32.js"(exports2, module2) {
+// node_modules/fs-extra/lib/mkdirs/utils.js
+var require_utils = __commonJS({
+  "node_modules/fs-extra/lib/mkdirs/utils.js"(exports2, module2) {
     "use strict";
     var path2 = require("path");
-    function getRootPath(p) {
-      p = path2.normalize(path2.resolve(p)).split(path2.sep);
-      if (p.length > 0) return p[0];
-      return null;
-    }
-    var INVALID_PATH_CHARS = /[<>:"|?*]/;
-    function invalidWin32Path(p) {
-      const rp = getRootPath(p);
-      p = p.replace(rp, "");
-      return INVALID_PATH_CHARS.test(p);
-    }
-    module2.exports = {
-      getRootPath,
-      invalidWin32Path
+    module2.exports.checkPath = function checkPath(pth) {
+      if (process.platform === "win32") {
+        const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path2.parse(pth).root, ""));
+        if (pathHasInvalidWinCharacters) {
+          const error = new Error(`Path contains invalid characters: ${pth}`);
+          error.code = "EINVAL";
+          throw error;
+        }
+      }
     };
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/mkdirs/mkdirs.js
+// node_modules/fs-extra/lib/mkdirs/make-dir.js
+var require_make_dir = __commonJS({
+  "node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports2, module2) {
+    "use strict";
+    var fs2 = require_fs();
+    var { checkPath } = require_utils();
+    var getMode = (options) => {
+      const defaults = { mode: 511 };
+      if (typeof options === "number") return options;
+      return { ...defaults, ...options }.mode;
+    };
+    module2.exports.makeDir = async (dir, options) => {
+      checkPath(dir);
+      return fs2.mkdir(dir, {
+        mode: getMode(options),
+        recursive: true
+      });
+    };
+    module2.exports.makeDirSync = (dir, options) => {
+      checkPath(dir);
+      return fs2.mkdirSync(dir, {
+        mode: getMode(options),
+        recursive: true
+      });
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/mkdirs/index.js
 var require_mkdirs = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/mkdirs/mkdirs.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/mkdirs/index.js"(exports2, module2) {
     "use strict";
-    var fs2 = require_graceful_fs();
-    var path2 = require("path");
-    var invalidWin32Path = require_win32().invalidWin32Path;
-    var o777 = parseInt("0777", 8);
-    function mkdirs(p, opts, callback, made) {
-      if (typeof opts === "function") {
-        callback = opts;
-        opts = {};
-      } else if (!opts || typeof opts !== "object") {
-        opts = { mode: opts };
-      }
-      if (process.platform === "win32" && invalidWin32Path(p)) {
-        const errInval = new Error(p + " contains invalid WIN32 path characters.");
-        errInval.code = "EINVAL";
-        return callback(errInval);
-      }
-      let mode = opts.mode;
-      const xfs = opts.fs || fs2;
-      if (mode === void 0) {
-        mode = o777 & ~process.umask();
-      }
-      if (!made) made = null;
-      callback = callback || function() {
-      };
-      p = path2.resolve(p);
-      xfs.mkdir(p, mode, (er) => {
-        if (!er) {
-          made = made || p;
-          return callback(null, made);
-        }
-        switch (er.code) {
-          case "ENOENT":
-            if (path2.dirname(p) === p) return callback(er);
-            mkdirs(path2.dirname(p), opts, (er2, made2) => {
-              if (er2) callback(er2, made2);
-              else mkdirs(p, opts, callback, made2);
-            });
-            break;
-          default:
-            xfs.stat(p, (er2, stat) => {
-              if (er2 || !stat.isDirectory()) callback(er, made);
-              else callback(null, made);
-            });
-            break;
-        }
-      });
-    }
-    module2.exports = mkdirs;
-  }
-});
-
-// ../../../../../../node_modules/fs-extra/lib/mkdirs/mkdirs-sync.js
-var require_mkdirs_sync = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/mkdirs/mkdirs-sync.js"(exports2, module2) {
-    "use strict";
-    var fs2 = require_graceful_fs();
-    var path2 = require("path");
-    var invalidWin32Path = require_win32().invalidWin32Path;
-    var o777 = parseInt("0777", 8);
-    function mkdirsSync(p, opts, made) {
-      if (!opts || typeof opts !== "object") {
-        opts = { mode: opts };
-      }
-      let mode = opts.mode;
-      const xfs = opts.fs || fs2;
-      if (process.platform === "win32" && invalidWin32Path(p)) {
-        const errInval = new Error(p + " contains invalid WIN32 path characters.");
-        errInval.code = "EINVAL";
-        throw errInval;
-      }
-      if (mode === void 0) {
-        mode = o777 & ~process.umask();
-      }
-      if (!made) made = null;
-      p = path2.resolve(p);
-      try {
-        xfs.mkdirSync(p, mode);
-        made = made || p;
-      } catch (err0) {
-        if (err0.code === "ENOENT") {
-          if (path2.dirname(p) === p) throw err0;
-          made = mkdirsSync(path2.dirname(p), opts, made);
-          mkdirsSync(p, opts, made);
-        } else {
-          let stat;
-          try {
-            stat = xfs.statSync(p);
-          } catch (err1) {
-            throw err0;
-          }
-          if (!stat.isDirectory()) throw err0;
-        }
-      }
-      return made;
-    }
-    module2.exports = mkdirsSync;
-  }
-});
-
-// ../../../../../../node_modules/fs-extra/lib/mkdirs/index.js
-var require_mkdirs2 = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/mkdirs/index.js"(exports2, module2) {
-    "use strict";
-    var u = require_universalify().fromCallback;
-    var mkdirs = u(require_mkdirs());
-    var mkdirsSync = require_mkdirs_sync();
+    var u = require_universalify().fromPromise;
+    var { makeDir: _makeDir, makeDirSync } = require_make_dir();
+    var makeDir = u(_makeDir);
     module2.exports = {
-      mkdirs,
-      mkdirsSync,
+      mkdirs: makeDir,
+      mkdirsSync: makeDirSync,
       // alias
-      mkdirp: mkdirs,
-      mkdirpSync: mkdirsSync,
-      ensureDir: mkdirs,
-      ensureDirSync: mkdirsSync
+      mkdirp: makeDir,
+      mkdirpSync: makeDirSync,
+      ensureDir: makeDir,
+      ensureDirSync: makeDirSync
     };
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/util/utimes.js
-var require_utimes = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/util/utimes.js"(exports2, module2) {
+// node_modules/fs-extra/lib/path-exists/index.js
+var require_path_exists = __commonJS({
+  "node_modules/fs-extra/lib/path-exists/index.js"(exports2, module2) {
     "use strict";
-    var fs2 = require_graceful_fs();
-    var os2 = require("os");
-    var path2 = require("path");
-    function hasMillisResSync() {
-      let tmpfile = path2.join("millis-test-sync" + Date.now().toString() + Math.random().toString().slice(2));
-      tmpfile = path2.join(os2.tmpdir(), tmpfile);
-      const d = /* @__PURE__ */ new Date(1435410243862);
-      fs2.writeFileSync(tmpfile, "https://github.com/jprichardson/node-fs-extra/pull/141");
-      const fd = fs2.openSync(tmpfile, "r+");
-      fs2.futimesSync(fd, d, d);
-      fs2.closeSync(fd);
-      return fs2.statSync(tmpfile).mtime > 1435410243e3;
+    var u = require_universalify().fromPromise;
+    var fs2 = require_fs();
+    function pathExists(path2) {
+      return fs2.access(path2).then(() => true).catch(() => false);
     }
-    function hasMillisRes(callback) {
-      let tmpfile = path2.join("millis-test" + Date.now().toString() + Math.random().toString().slice(2));
-      tmpfile = path2.join(os2.tmpdir(), tmpfile);
-      const d = /* @__PURE__ */ new Date(1435410243862);
-      fs2.writeFile(tmpfile, "https://github.com/jprichardson/node-fs-extra/pull/141", (err) => {
-        if (err) return callback(err);
-        fs2.open(tmpfile, "r+", (err2, fd) => {
-          if (err2) return callback(err2);
-          fs2.futimes(fd, d, d, (err3) => {
-            if (err3) return callback(err3);
-            fs2.close(fd, (err4) => {
-              if (err4) return callback(err4);
-              fs2.stat(tmpfile, (err5, stats) => {
-                if (err5) return callback(err5);
-                callback(null, stats.mtime > 1435410243e3);
-              });
-            });
-          });
-        });
-      });
-    }
-    function timeRemoveMillis(timestamp) {
-      if (typeof timestamp === "number") {
-        return Math.floor(timestamp / 1e3) * 1e3;
-      } else if (timestamp instanceof Date) {
-        return new Date(Math.floor(timestamp.getTime() / 1e3) * 1e3);
-      } else {
-        throw new Error("fs-extra: timeRemoveMillis() unknown parameter type");
+    module2.exports = {
+      pathExists: u(pathExists),
+      pathExistsSync: fs2.existsSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/util/utimes.js
+var require_utimes = __commonJS({
+  "node_modules/fs-extra/lib/util/utimes.js"(exports2, module2) {
+    "use strict";
+    var fs2 = require_fs();
+    var u = require_universalify().fromPromise;
+    async function utimesMillis(path2, atime, mtime) {
+      const fd = await fs2.open(path2, "r+");
+      let closeErr = null;
+      try {
+        await fs2.futimes(fd, atime, mtime);
+      } finally {
+        try {
+          await fs2.close(fd);
+        } catch (e) {
+          closeErr = e;
+        }
+      }
+      if (closeErr) {
+        throw closeErr;
       }
     }
-    function utimesMillis(path3, atime, mtime, callback) {
-      fs2.open(path3, "r+", (err, fd) => {
-        if (err) return callback(err);
-        fs2.futimes(fd, atime, mtime, (futimesErr) => {
-          fs2.close(fd, (closeErr) => {
-            if (callback) callback(futimesErr || closeErr);
-          });
-        });
-      });
-    }
-    function utimesMillisSync(path3, atime, mtime) {
-      const fd = fs2.openSync(path3, "r+");
+    function utimesMillisSync(path2, atime, mtime) {
+      const fd = fs2.openSync(path2, "r+");
       fs2.futimesSync(fd, atime, mtime);
       return fs2.closeSync(fd);
     }
     module2.exports = {
-      hasMillisRes,
-      hasMillisResSync,
-      timeRemoveMillis,
-      utimesMillis,
+      utimesMillis: u(utimesMillis),
       utimesMillisSync
     };
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/util/stat.js
+// node_modules/fs-extra/lib/util/stat.js
 var require_stat = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/util/stat.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/util/stat.js"(exports2, module2) {
     "use strict";
-    var fs2 = require_graceful_fs();
+    var fs2 = require_fs();
     var path2 = require("path");
-    var NODE_VERSION_MAJOR_WITH_BIGINT = 10;
-    var NODE_VERSION_MINOR_WITH_BIGINT = 5;
-    var NODE_VERSION_PATCH_WITH_BIGINT = 0;
-    var nodeVersion = process.versions.node.split(".");
-    var nodeVersionMajor = Number.parseInt(nodeVersion[0], 10);
-    var nodeVersionMinor = Number.parseInt(nodeVersion[1], 10);
-    var nodeVersionPatch = Number.parseInt(nodeVersion[2], 10);
-    function nodeSupportsBigInt() {
-      if (nodeVersionMajor > NODE_VERSION_MAJOR_WITH_BIGINT) {
-        return true;
-      } else if (nodeVersionMajor === NODE_VERSION_MAJOR_WITH_BIGINT) {
-        if (nodeVersionMinor > NODE_VERSION_MINOR_WITH_BIGINT) {
-          return true;
-        } else if (nodeVersionMinor === NODE_VERSION_MINOR_WITH_BIGINT) {
-          if (nodeVersionPatch >= NODE_VERSION_PATCH_WITH_BIGINT) {
-            return true;
-          }
-        }
-      }
-      return false;
+    var u = require_universalify().fromPromise;
+    function getStats(src, dest, opts) {
+      const statFunc = opts.dereference ? (file) => fs2.stat(file, { bigint: true }) : (file) => fs2.lstat(file, { bigint: true });
+      return Promise.all([
+        statFunc(src),
+        statFunc(dest).catch((err) => {
+          if (err.code === "ENOENT") return null;
+          throw err;
+        })
+      ]).then(([srcStat, destStat]) => ({ srcStat, destStat }));
     }
-    function getStats(src, dest, cb) {
-      if (nodeSupportsBigInt()) {
-        fs2.stat(src, { bigint: true }, (err, srcStat) => {
-          if (err) return cb(err);
-          fs2.stat(dest, { bigint: true }, (err2, destStat) => {
-            if (err2) {
-              if (err2.code === "ENOENT") return cb(null, { srcStat, destStat: null });
-              return cb(err2);
-            }
-            return cb(null, { srcStat, destStat });
-          });
-        });
-      } else {
-        fs2.stat(src, (err, srcStat) => {
-          if (err) return cb(err);
-          fs2.stat(dest, (err2, destStat) => {
-            if (err2) {
-              if (err2.code === "ENOENT") return cb(null, { srcStat, destStat: null });
-              return cb(err2);
-            }
-            return cb(null, { srcStat, destStat });
-          });
-        });
-      }
-    }
-    function getStatsSync(src, dest) {
-      let srcStat, destStat;
-      if (nodeSupportsBigInt()) {
-        srcStat = fs2.statSync(src, { bigint: true });
-      } else {
-        srcStat = fs2.statSync(src);
-      }
+    function getStatsSync(src, dest, opts) {
+      let destStat;
+      const statFunc = opts.dereference ? (file) => fs2.statSync(file, { bigint: true }) : (file) => fs2.lstatSync(file, { bigint: true });
+      const srcStat = statFunc(src);
       try {
-        if (nodeSupportsBigInt()) {
-          destStat = fs2.statSync(dest, { bigint: true });
-        } else {
-          destStat = fs2.statSync(dest);
-        }
+        destStat = statFunc(dest);
       } catch (err) {
         if (err.code === "ENOENT") return { srcStat, destStat: null };
         throw err;
       }
       return { srcStat, destStat };
     }
-    function checkPaths(src, dest, funcName, cb) {
-      getStats(src, dest, (err, stats) => {
-        if (err) return cb(err);
-        const { srcStat, destStat } = stats;
-        if (destStat && destStat.ino && destStat.dev && destStat.ino === srcStat.ino && destStat.dev === srcStat.dev) {
-          return cb(new Error("Source and destination must not be the same."));
+    async function checkPaths(src, dest, funcName, opts) {
+      const { srcStat, destStat } = await getStats(src, dest, opts);
+      if (destStat) {
+        if (areIdentical(srcStat, destStat)) {
+          const srcBaseName = path2.basename(src);
+          const destBaseName = path2.basename(dest);
+          if (funcName === "move" && srcBaseName !== destBaseName && srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
+            return { srcStat, destStat, isChangingCase: true };
+          }
+          throw new Error("Source and destination must not be the same.");
         }
-        if (srcStat.isDirectory() && isSrcSubdir(src, dest)) {
-          return cb(new Error(errMsg(src, dest, funcName)));
+        if (srcStat.isDirectory() && !destStat.isDirectory()) {
+          throw new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`);
         }
-        return cb(null, { srcStat, destStat });
-      });
-    }
-    function checkPathsSync(src, dest, funcName) {
-      const { srcStat, destStat } = getStatsSync(src, dest);
-      if (destStat && destStat.ino && destStat.dev && destStat.ino === srcStat.ino && destStat.dev === srcStat.dev) {
-        throw new Error("Source and destination must not be the same.");
+        if (!srcStat.isDirectory() && destStat.isDirectory()) {
+          throw new Error(`Cannot overwrite directory '${dest}' with non-directory '${src}'.`);
+        }
       }
       if (srcStat.isDirectory() && isSrcSubdir(src, dest)) {
         throw new Error(errMsg(src, dest, funcName));
       }
       return { srcStat, destStat };
     }
-    function checkParentPaths(src, srcStat, dest, funcName, cb) {
+    function checkPathsSync(src, dest, funcName, opts) {
+      const { srcStat, destStat } = getStatsSync(src, dest, opts);
+      if (destStat) {
+        if (areIdentical(srcStat, destStat)) {
+          const srcBaseName = path2.basename(src);
+          const destBaseName = path2.basename(dest);
+          if (funcName === "move" && srcBaseName !== destBaseName && srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
+            return { srcStat, destStat, isChangingCase: true };
+          }
+          throw new Error("Source and destination must not be the same.");
+        }
+        if (srcStat.isDirectory() && !destStat.isDirectory()) {
+          throw new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`);
+        }
+        if (!srcStat.isDirectory() && destStat.isDirectory()) {
+          throw new Error(`Cannot overwrite directory '${dest}' with non-directory '${src}'.`);
+        }
+      }
+      if (srcStat.isDirectory() && isSrcSubdir(src, dest)) {
+        throw new Error(errMsg(src, dest, funcName));
+      }
+      return { srcStat, destStat };
+    }
+    async function checkParentPaths(src, srcStat, dest, funcName) {
       const srcParent = path2.resolve(path2.dirname(src));
       const destParent = path2.resolve(path2.dirname(dest));
-      if (destParent === srcParent || destParent === path2.parse(destParent).root) return cb();
-      if (nodeSupportsBigInt()) {
-        fs2.stat(destParent, { bigint: true }, (err, destStat) => {
-          if (err) {
-            if (err.code === "ENOENT") return cb();
-            return cb(err);
-          }
-          if (destStat.ino && destStat.dev && destStat.ino === srcStat.ino && destStat.dev === srcStat.dev) {
-            return cb(new Error(errMsg(src, dest, funcName)));
-          }
-          return checkParentPaths(src, srcStat, destParent, funcName, cb);
-        });
-      } else {
-        fs2.stat(destParent, (err, destStat) => {
-          if (err) {
-            if (err.code === "ENOENT") return cb();
-            return cb(err);
-          }
-          if (destStat.ino && destStat.dev && destStat.ino === srcStat.ino && destStat.dev === srcStat.dev) {
-            return cb(new Error(errMsg(src, dest, funcName)));
-          }
-          return checkParentPaths(src, srcStat, destParent, funcName, cb);
-        });
+      if (destParent === srcParent || destParent === path2.parse(destParent).root) return;
+      let destStat;
+      try {
+        destStat = await fs2.stat(destParent, { bigint: true });
+      } catch (err) {
+        if (err.code === "ENOENT") return;
+        throw err;
       }
+      if (areIdentical(srcStat, destStat)) {
+        throw new Error(errMsg(src, dest, funcName));
+      }
+      return checkParentPaths(src, srcStat, destParent, funcName);
     }
     function checkParentPathsSync(src, srcStat, dest, funcName) {
       const srcParent = path2.resolve(path2.dirname(src));
@@ -1270,63 +1161,172 @@ var require_stat = __commonJS({
       if (destParent === srcParent || destParent === path2.parse(destParent).root) return;
       let destStat;
       try {
-        if (nodeSupportsBigInt()) {
-          destStat = fs2.statSync(destParent, { bigint: true });
-        } else {
-          destStat = fs2.statSync(destParent);
-        }
+        destStat = fs2.statSync(destParent, { bigint: true });
       } catch (err) {
         if (err.code === "ENOENT") return;
         throw err;
       }
-      if (destStat.ino && destStat.dev && destStat.ino === srcStat.ino && destStat.dev === srcStat.dev) {
+      if (areIdentical(srcStat, destStat)) {
         throw new Error(errMsg(src, dest, funcName));
       }
       return checkParentPathsSync(src, srcStat, destParent, funcName);
     }
+    function areIdentical(srcStat, destStat) {
+      return destStat.ino && destStat.dev && destStat.ino === srcStat.ino && destStat.dev === srcStat.dev;
+    }
     function isSrcSubdir(src, dest) {
       const srcArr = path2.resolve(src).split(path2.sep).filter((i) => i);
       const destArr = path2.resolve(dest).split(path2.sep).filter((i) => i);
-      return srcArr.reduce((acc, cur, i) => acc && destArr[i] === cur, true);
+      return srcArr.every((cur, i) => destArr[i] === cur);
     }
     function errMsg(src, dest, funcName) {
       return `Cannot ${funcName} '${src}' to a subdirectory of itself, '${dest}'.`;
     }
     module2.exports = {
-      checkPaths,
+      // checkPaths
+      checkPaths: u(checkPaths),
       checkPathsSync,
-      checkParentPaths,
+      // checkParent
+      checkParentPaths: u(checkParentPaths),
       checkParentPathsSync,
-      isSrcSubdir
+      // Misc
+      isSrcSubdir,
+      areIdentical
     };
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/util/buffer.js
-var require_buffer = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/util/buffer.js"(exports2, module2) {
+// node_modules/fs-extra/lib/copy/copy.js
+var require_copy = __commonJS({
+  "node_modules/fs-extra/lib/copy/copy.js"(exports2, module2) {
     "use strict";
-    module2.exports = function(size) {
-      if (typeof Buffer.allocUnsafe === "function") {
-        try {
-          return Buffer.allocUnsafe(size);
-        } catch (e) {
-          return new Buffer(size);
-        }
+    var fs2 = require_fs();
+    var path2 = require("path");
+    var { mkdirs } = require_mkdirs();
+    var { pathExists } = require_path_exists();
+    var { utimesMillis } = require_utimes();
+    var stat = require_stat();
+    async function copy(src, dest, opts = {}) {
+      if (typeof opts === "function") {
+        opts = { filter: opts };
       }
-      return new Buffer(size);
-    };
+      opts.clobber = "clobber" in opts ? !!opts.clobber : true;
+      opts.overwrite = "overwrite" in opts ? !!opts.overwrite : opts.clobber;
+      if (opts.preserveTimestamps && process.arch === "ia32") {
+        process.emitWarning(
+          "Using the preserveTimestamps option in 32-bit node is not recommended;\n\n	see https://github.com/jprichardson/node-fs-extra/issues/269",
+          "Warning",
+          "fs-extra-WARN0001"
+        );
+      }
+      const { srcStat, destStat } = await stat.checkPaths(src, dest, "copy", opts);
+      await stat.checkParentPaths(src, srcStat, dest, "copy");
+      const include = await runFilter(src, dest, opts);
+      if (!include) return;
+      const destParent = path2.dirname(dest);
+      const dirExists = await pathExists(destParent);
+      if (!dirExists) {
+        await mkdirs(destParent);
+      }
+      await getStatsAndPerformCopy(destStat, src, dest, opts);
+    }
+    async function runFilter(src, dest, opts) {
+      if (!opts.filter) return true;
+      return opts.filter(src, dest);
+    }
+    async function getStatsAndPerformCopy(destStat, src, dest, opts) {
+      const statFn = opts.dereference ? fs2.stat : fs2.lstat;
+      const srcStat = await statFn(src);
+      if (srcStat.isDirectory()) return onDir(srcStat, destStat, src, dest, opts);
+      if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice()) return onFile(srcStat, destStat, src, dest, opts);
+      if (srcStat.isSymbolicLink()) return onLink(destStat, src, dest, opts);
+      if (srcStat.isSocket()) throw new Error(`Cannot copy a socket file: ${src}`);
+      if (srcStat.isFIFO()) throw new Error(`Cannot copy a FIFO pipe: ${src}`);
+      throw new Error(`Unknown file: ${src}`);
+    }
+    async function onFile(srcStat, destStat, src, dest, opts) {
+      if (!destStat) return copyFile(srcStat, src, dest, opts);
+      if (opts.overwrite) {
+        await fs2.unlink(dest);
+        return copyFile(srcStat, src, dest, opts);
+      }
+      if (opts.errorOnExist) {
+        throw new Error(`'${dest}' already exists`);
+      }
+    }
+    async function copyFile(srcStat, src, dest, opts) {
+      await fs2.copyFile(src, dest);
+      if (opts.preserveTimestamps) {
+        if (fileIsNotWritable(srcStat.mode)) {
+          await makeFileWritable(dest, srcStat.mode);
+        }
+        const updatedSrcStat = await fs2.stat(src);
+        await utimesMillis(dest, updatedSrcStat.atime, updatedSrcStat.mtime);
+      }
+      return fs2.chmod(dest, srcStat.mode);
+    }
+    function fileIsNotWritable(srcMode) {
+      return (srcMode & 128) === 0;
+    }
+    function makeFileWritable(dest, srcMode) {
+      return fs2.chmod(dest, srcMode | 128);
+    }
+    async function onDir(srcStat, destStat, src, dest, opts) {
+      if (!destStat) {
+        await fs2.mkdir(dest);
+      }
+      const items = await fs2.readdir(src);
+      await Promise.all(items.map(async (item) => {
+        const srcItem = path2.join(src, item);
+        const destItem = path2.join(dest, item);
+        const include = await runFilter(srcItem, destItem, opts);
+        if (!include) return;
+        const { destStat: destStat2 } = await stat.checkPaths(srcItem, destItem, "copy", opts);
+        return getStatsAndPerformCopy(destStat2, srcItem, destItem, opts);
+      }));
+      if (!destStat) {
+        await fs2.chmod(dest, srcStat.mode);
+      }
+    }
+    async function onLink(destStat, src, dest, opts) {
+      let resolvedSrc = await fs2.readlink(src);
+      if (opts.dereference) {
+        resolvedSrc = path2.resolve(process.cwd(), resolvedSrc);
+      }
+      if (!destStat) {
+        return fs2.symlink(resolvedSrc, dest);
+      }
+      let resolvedDest = null;
+      try {
+        resolvedDest = await fs2.readlink(dest);
+      } catch (e) {
+        if (e.code === "EINVAL" || e.code === "UNKNOWN") return fs2.symlink(resolvedSrc, dest);
+        throw e;
+      }
+      if (opts.dereference) {
+        resolvedDest = path2.resolve(process.cwd(), resolvedDest);
+      }
+      if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
+        throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`);
+      }
+      if (stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
+        throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
+      }
+      await fs2.unlink(dest);
+      return fs2.symlink(resolvedSrc, dest);
+    }
+    module2.exports = copy;
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/copy-sync/copy-sync.js
+// node_modules/fs-extra/lib/copy/copy-sync.js
 var require_copy_sync = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/copy-sync/copy-sync.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/copy/copy-sync.js"(exports2, module2) {
     "use strict";
     var fs2 = require_graceful_fs();
     var path2 = require("path");
-    var mkdirpSync = require_mkdirs2().mkdirsSync;
-    var utimesSync = require_utimes().utimesMillisSync;
+    var mkdirsSync = require_mkdirs().mkdirsSync;
+    var utimesMillisSync = require_utimes().utimesMillisSync;
     var stat = require_stat();
     function copySync(src, dest, opts) {
       if (typeof opts === "function") {
@@ -1336,22 +1336,17 @@ var require_copy_sync = __commonJS({
       opts.clobber = "clobber" in opts ? !!opts.clobber : true;
       opts.overwrite = "overwrite" in opts ? !!opts.overwrite : opts.clobber;
       if (opts.preserveTimestamps && process.arch === "ia32") {
-        console.warn(`fs-extra: Using the preserveTimestamps option in 32-bit node is not recommended;
-
-    see https://github.com/jprichardson/node-fs-extra/issues/269`);
+        process.emitWarning(
+          "Using the preserveTimestamps option in 32-bit node is not recommended;\n\n	see https://github.com/jprichardson/node-fs-extra/issues/269",
+          "Warning",
+          "fs-extra-WARN0002"
+        );
       }
-      const { srcStat, destStat } = stat.checkPathsSync(src, dest, "copy");
+      const { srcStat, destStat } = stat.checkPathsSync(src, dest, "copy", opts);
       stat.checkParentPathsSync(src, srcStat, dest, "copy");
-      return handleFilterAndCopy(destStat, src, dest, opts);
-    }
-    function handleFilterAndCopy(destStat, src, dest, opts) {
       if (opts.filter && !opts.filter(src, dest)) return;
       const destParent = path2.dirname(dest);
-      if (!fs2.existsSync(destParent)) mkdirpSync(destParent);
-      return startCopy(destStat, src, dest, opts);
-    }
-    function startCopy(destStat, src, dest, opts) {
-      if (opts.filter && !opts.filter(src, dest)) return;
+      if (!fs2.existsSync(destParent)) mkdirsSync(destParent);
       return getStats(destStat, src, dest, opts);
     }
     function getStats(destStat, src, dest, opts) {
@@ -1360,6 +1355,9 @@ var require_copy_sync = __commonJS({
       if (srcStat.isDirectory()) return onDir(srcStat, destStat, src, dest, opts);
       else if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice()) return onFile(srcStat, destStat, src, dest, opts);
       else if (srcStat.isSymbolicLink()) return onLink(destStat, src, dest, opts);
+      else if (srcStat.isSocket()) throw new Error(`Cannot copy a socket file: ${src}`);
+      else if (srcStat.isFIFO()) throw new Error(`Cannot copy a FIFO pipe: ${src}`);
+      throw new Error(`Unknown file: ${src}`);
     }
     function onFile(srcStat, destStat, src, dest, opts) {
       if (!destStat) return copyFile(srcStat, src, dest, opts);
@@ -1374,42 +1372,35 @@ var require_copy_sync = __commonJS({
       }
     }
     function copyFile(srcStat, src, dest, opts) {
-      if (typeof fs2.copyFileSync === "function") {
-        fs2.copyFileSync(src, dest);
-        fs2.chmodSync(dest, srcStat.mode);
-        if (opts.preserveTimestamps) {
-          return utimesSync(dest, srcStat.atime, srcStat.mtime);
-        }
-        return;
-      }
-      return copyFileFallback(srcStat, src, dest, opts);
+      fs2.copyFileSync(src, dest);
+      if (opts.preserveTimestamps) handleTimestamps(srcStat.mode, src, dest);
+      return setDestMode(dest, srcStat.mode);
     }
-    function copyFileFallback(srcStat, src, dest, opts) {
-      const BUF_LENGTH = 64 * 1024;
-      const _buff = require_buffer()(BUF_LENGTH);
-      const fdr = fs2.openSync(src, "r");
-      const fdw = fs2.openSync(dest, "w", srcStat.mode);
-      let pos = 0;
-      while (pos < srcStat.size) {
-        const bytesRead = fs2.readSync(fdr, _buff, 0, BUF_LENGTH, pos);
-        fs2.writeSync(fdw, _buff, 0, bytesRead);
-        pos += bytesRead;
-      }
-      if (opts.preserveTimestamps) fs2.futimesSync(fdw, srcStat.atime, srcStat.mtime);
-      fs2.closeSync(fdr);
-      fs2.closeSync(fdw);
+    function handleTimestamps(srcMode, src, dest) {
+      if (fileIsNotWritable(srcMode)) makeFileWritable(dest, srcMode);
+      return setDestTimestamps(src, dest);
+    }
+    function fileIsNotWritable(srcMode) {
+      return (srcMode & 128) === 0;
+    }
+    function makeFileWritable(dest, srcMode) {
+      return setDestMode(dest, srcMode | 128);
+    }
+    function setDestMode(dest, srcMode) {
+      return fs2.chmodSync(dest, srcMode);
+    }
+    function setDestTimestamps(src, dest) {
+      const updatedSrcStat = fs2.statSync(src);
+      return utimesMillisSync(dest, updatedSrcStat.atime, updatedSrcStat.mtime);
     }
     function onDir(srcStat, destStat, src, dest, opts) {
-      if (!destStat) return mkDirAndCopy(srcStat, src, dest, opts);
-      if (destStat && !destStat.isDirectory()) {
-        throw new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`);
-      }
+      if (!destStat) return mkDirAndCopy(srcStat.mode, src, dest, opts);
       return copyDir(src, dest, opts);
     }
-    function mkDirAndCopy(srcStat, src, dest, opts) {
+    function mkDirAndCopy(srcMode, src, dest, opts) {
       fs2.mkdirSync(dest);
       copyDir(src, dest, opts);
-      return fs2.chmodSync(dest, srcStat.mode);
+      return setDestMode(dest, srcMode);
     }
     function copyDir(src, dest, opts) {
       fs2.readdirSync(src).forEach((item) => copyDirItem(item, src, dest, opts));
@@ -1417,8 +1408,9 @@ var require_copy_sync = __commonJS({
     function copyDirItem(item, src, dest, opts) {
       const srcItem = path2.join(src, item);
       const destItem = path2.join(dest, item);
-      const { destStat } = stat.checkPathsSync(srcItem, destItem, "copy");
-      return startCopy(destStat, srcItem, destItem, opts);
+      if (opts.filter && !opts.filter(srcItem, destItem)) return;
+      const { destStat } = stat.checkPathsSync(srcItem, destItem, "copy", opts);
+      return getStats(destStat, srcItem, destItem, opts);
     }
     function onLink(destStat, src, dest, opts) {
       let resolvedSrc = fs2.readlinkSync(src);
@@ -1441,7 +1433,7 @@ var require_copy_sync = __commonJS({
         if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
           throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`);
         }
-        if (fs2.statSync(dest).isDirectory() && stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
+        if (stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
           throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
         }
         return copyLink(resolvedSrc, dest);
@@ -1455,517 +1447,60 @@ var require_copy_sync = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/copy-sync/index.js
-var require_copy_sync2 = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/copy-sync/index.js"(exports2, module2) {
+// node_modules/fs-extra/lib/copy/index.js
+var require_copy2 = __commonJS({
+  "node_modules/fs-extra/lib/copy/index.js"(exports2, module2) {
     "use strict";
+    var u = require_universalify().fromPromise;
     module2.exports = {
+      copy: u(require_copy()),
       copySync: require_copy_sync()
     };
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/path-exists/index.js
-var require_path_exists = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/path-exists/index.js"(exports2, module2) {
+// node_modules/fs-extra/lib/remove/index.js
+var require_remove = __commonJS({
+  "node_modules/fs-extra/lib/remove/index.js"(exports2, module2) {
+    "use strict";
+    var fs2 = require_graceful_fs();
+    var u = require_universalify().fromCallback;
+    function remove(path2, callback) {
+      fs2.rm(path2, { recursive: true, force: true }, callback);
+    }
+    function removeSync(path2) {
+      fs2.rmSync(path2, { recursive: true, force: true });
+    }
+    module2.exports = {
+      remove: u(remove),
+      removeSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/empty/index.js
+var require_empty = __commonJS({
+  "node_modules/fs-extra/lib/empty/index.js"(exports2, module2) {
     "use strict";
     var u = require_universalify().fromPromise;
     var fs2 = require_fs();
-    function pathExists(path2) {
-      return fs2.access(path2).then(() => true).catch(() => false);
-    }
-    module2.exports = {
-      pathExists: u(pathExists),
-      pathExistsSync: fs2.existsSync
-    };
-  }
-});
-
-// ../../../../../../node_modules/fs-extra/lib/copy/copy.js
-var require_copy = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/copy/copy.js"(exports2, module2) {
-    "use strict";
-    var fs2 = require_graceful_fs();
     var path2 = require("path");
-    var mkdirp = require_mkdirs2().mkdirs;
-    var pathExists = require_path_exists().pathExists;
-    var utimes = require_utimes().utimesMillis;
-    var stat = require_stat();
-    function copy(src, dest, opts, cb) {
-      if (typeof opts === "function" && !cb) {
-        cb = opts;
-        opts = {};
-      } else if (typeof opts === "function") {
-        opts = { filter: opts };
-      }
-      cb = cb || function() {
-      };
-      opts = opts || {};
-      opts.clobber = "clobber" in opts ? !!opts.clobber : true;
-      opts.overwrite = "overwrite" in opts ? !!opts.overwrite : opts.clobber;
-      if (opts.preserveTimestamps && process.arch === "ia32") {
-        console.warn(`fs-extra: Using the preserveTimestamps option in 32-bit node is not recommended;
-
-    see https://github.com/jprichardson/node-fs-extra/issues/269`);
-      }
-      stat.checkPaths(src, dest, "copy", (err, stats) => {
-        if (err) return cb(err);
-        const { srcStat, destStat } = stats;
-        stat.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
-          if (err2) return cb(err2);
-          if (opts.filter) return handleFilter(checkParentDir, destStat, src, dest, opts, cb);
-          return checkParentDir(destStat, src, dest, opts, cb);
-        });
-      });
-    }
-    function checkParentDir(destStat, src, dest, opts, cb) {
-      const destParent = path2.dirname(dest);
-      pathExists(destParent, (err, dirExists) => {
-        if (err) return cb(err);
-        if (dirExists) return startCopy(destStat, src, dest, opts, cb);
-        mkdirp(destParent, (err2) => {
-          if (err2) return cb(err2);
-          return startCopy(destStat, src, dest, opts, cb);
-        });
-      });
-    }
-    function handleFilter(onInclude, destStat, src, dest, opts, cb) {
-      Promise.resolve(opts.filter(src, dest)).then((include) => {
-        if (include) return onInclude(destStat, src, dest, opts, cb);
-        return cb();
-      }, (error) => cb(error));
-    }
-    function startCopy(destStat, src, dest, opts, cb) {
-      if (opts.filter) return handleFilter(getStats, destStat, src, dest, opts, cb);
-      return getStats(destStat, src, dest, opts, cb);
-    }
-    function getStats(destStat, src, dest, opts, cb) {
-      const stat2 = opts.dereference ? fs2.stat : fs2.lstat;
-      stat2(src, (err, srcStat) => {
-        if (err) return cb(err);
-        if (srcStat.isDirectory()) return onDir(srcStat, destStat, src, dest, opts, cb);
-        else if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice()) return onFile(srcStat, destStat, src, dest, opts, cb);
-        else if (srcStat.isSymbolicLink()) return onLink(destStat, src, dest, opts, cb);
-      });
-    }
-    function onFile(srcStat, destStat, src, dest, opts, cb) {
-      if (!destStat) return copyFile(srcStat, src, dest, opts, cb);
-      return mayCopyFile(srcStat, src, dest, opts, cb);
-    }
-    function mayCopyFile(srcStat, src, dest, opts, cb) {
-      if (opts.overwrite) {
-        fs2.unlink(dest, (err) => {
-          if (err) return cb(err);
-          return copyFile(srcStat, src, dest, opts, cb);
-        });
-      } else if (opts.errorOnExist) {
-        return cb(new Error(`'${dest}' already exists`));
-      } else return cb();
-    }
-    function copyFile(srcStat, src, dest, opts, cb) {
-      if (typeof fs2.copyFile === "function") {
-        return fs2.copyFile(src, dest, (err) => {
-          if (err) return cb(err);
-          return setDestModeAndTimestamps(srcStat, dest, opts, cb);
-        });
-      }
-      return copyFileFallback(srcStat, src, dest, opts, cb);
-    }
-    function copyFileFallback(srcStat, src, dest, opts, cb) {
-      const rs = fs2.createReadStream(src);
-      rs.on("error", (err) => cb(err)).once("open", () => {
-        const ws = fs2.createWriteStream(dest, { mode: srcStat.mode });
-        ws.on("error", (err) => cb(err)).on("open", () => rs.pipe(ws)).once("close", () => setDestModeAndTimestamps(srcStat, dest, opts, cb));
-      });
-    }
-    function setDestModeAndTimestamps(srcStat, dest, opts, cb) {
-      fs2.chmod(dest, srcStat.mode, (err) => {
-        if (err) return cb(err);
-        if (opts.preserveTimestamps) {
-          return utimes(dest, srcStat.atime, srcStat.mtime, cb);
-        }
-        return cb();
-      });
-    }
-    function onDir(srcStat, destStat, src, dest, opts, cb) {
-      if (!destStat) return mkDirAndCopy(srcStat, src, dest, opts, cb);
-      if (destStat && !destStat.isDirectory()) {
-        return cb(new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`));
-      }
-      return copyDir(src, dest, opts, cb);
-    }
-    function mkDirAndCopy(srcStat, src, dest, opts, cb) {
-      fs2.mkdir(dest, (err) => {
-        if (err) return cb(err);
-        copyDir(src, dest, opts, (err2) => {
-          if (err2) return cb(err2);
-          return fs2.chmod(dest, srcStat.mode, cb);
-        });
-      });
-    }
-    function copyDir(src, dest, opts, cb) {
-      fs2.readdir(src, (err, items) => {
-        if (err) return cb(err);
-        return copyDirItems(items, src, dest, opts, cb);
-      });
-    }
-    function copyDirItems(items, src, dest, opts, cb) {
-      const item = items.pop();
-      if (!item) return cb();
-      return copyDirItem(items, item, src, dest, opts, cb);
-    }
-    function copyDirItem(items, item, src, dest, opts, cb) {
-      const srcItem = path2.join(src, item);
-      const destItem = path2.join(dest, item);
-      stat.checkPaths(srcItem, destItem, "copy", (err, stats) => {
-        if (err) return cb(err);
-        const { destStat } = stats;
-        startCopy(destStat, srcItem, destItem, opts, (err2) => {
-          if (err2) return cb(err2);
-          return copyDirItems(items, src, dest, opts, cb);
-        });
-      });
-    }
-    function onLink(destStat, src, dest, opts, cb) {
-      fs2.readlink(src, (err, resolvedSrc) => {
-        if (err) return cb(err);
-        if (opts.dereference) {
-          resolvedSrc = path2.resolve(process.cwd(), resolvedSrc);
-        }
-        if (!destStat) {
-          return fs2.symlink(resolvedSrc, dest, cb);
-        } else {
-          fs2.readlink(dest, (err2, resolvedDest) => {
-            if (err2) {
-              if (err2.code === "EINVAL" || err2.code === "UNKNOWN") return fs2.symlink(resolvedSrc, dest, cb);
-              return cb(err2);
-            }
-            if (opts.dereference) {
-              resolvedDest = path2.resolve(process.cwd(), resolvedDest);
-            }
-            if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
-              return cb(new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`));
-            }
-            if (destStat.isDirectory() && stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
-              return cb(new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`));
-            }
-            return copyLink(resolvedSrc, dest, cb);
-          });
-        }
-      });
-    }
-    function copyLink(resolvedSrc, dest, cb) {
-      fs2.unlink(dest, (err) => {
-        if (err) return cb(err);
-        return fs2.symlink(resolvedSrc, dest, cb);
-      });
-    }
-    module2.exports = copy;
-  }
-});
-
-// ../../../../../../node_modules/fs-extra/lib/copy/index.js
-var require_copy2 = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/copy/index.js"(exports2, module2) {
-    "use strict";
-    var u = require_universalify().fromCallback;
-    module2.exports = {
-      copy: u(require_copy())
-    };
-  }
-});
-
-// ../../../../../../node_modules/fs-extra/lib/remove/rimraf.js
-var require_rimraf = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/remove/rimraf.js"(exports2, module2) {
-    "use strict";
-    var fs2 = require_graceful_fs();
-    var path2 = require("path");
-    var assert = require("assert");
-    var isWindows = process.platform === "win32";
-    function defaults(options) {
-      const methods = [
-        "unlink",
-        "chmod",
-        "stat",
-        "lstat",
-        "rmdir",
-        "readdir"
-      ];
-      methods.forEach((m) => {
-        options[m] = options[m] || fs2[m];
-        m = m + "Sync";
-        options[m] = options[m] || fs2[m];
-      });
-      options.maxBusyTries = options.maxBusyTries || 3;
-    }
-    function rimraf(p, options, cb) {
-      let busyTries = 0;
-      if (typeof options === "function") {
-        cb = options;
-        options = {};
-      }
-      assert(p, "rimraf: missing path");
-      assert.strictEqual(typeof p, "string", "rimraf: path should be a string");
-      assert.strictEqual(typeof cb, "function", "rimraf: callback function required");
-      assert(options, "rimraf: invalid options argument provided");
-      assert.strictEqual(typeof options, "object", "rimraf: options should be object");
-      defaults(options);
-      rimraf_(p, options, function CB(er) {
-        if (er) {
-          if ((er.code === "EBUSY" || er.code === "ENOTEMPTY" || er.code === "EPERM") && busyTries < options.maxBusyTries) {
-            busyTries++;
-            const time = busyTries * 100;
-            return setTimeout(() => rimraf_(p, options, CB), time);
-          }
-          if (er.code === "ENOENT") er = null;
-        }
-        cb(er);
-      });
-    }
-    function rimraf_(p, options, cb) {
-      assert(p);
-      assert(options);
-      assert(typeof cb === "function");
-      options.lstat(p, (er, st) => {
-        if (er && er.code === "ENOENT") {
-          return cb(null);
-        }
-        if (er && er.code === "EPERM" && isWindows) {
-          return fixWinEPERM(p, options, er, cb);
-        }
-        if (st && st.isDirectory()) {
-          return rmdir(p, options, er, cb);
-        }
-        options.unlink(p, (er2) => {
-          if (er2) {
-            if (er2.code === "ENOENT") {
-              return cb(null);
-            }
-            if (er2.code === "EPERM") {
-              return isWindows ? fixWinEPERM(p, options, er2, cb) : rmdir(p, options, er2, cb);
-            }
-            if (er2.code === "EISDIR") {
-              return rmdir(p, options, er2, cb);
-            }
-          }
-          return cb(er2);
-        });
-      });
-    }
-    function fixWinEPERM(p, options, er, cb) {
-      assert(p);
-      assert(options);
-      assert(typeof cb === "function");
-      if (er) {
-        assert(er instanceof Error);
-      }
-      options.chmod(p, 438, (er2) => {
-        if (er2) {
-          cb(er2.code === "ENOENT" ? null : er);
-        } else {
-          options.stat(p, (er3, stats) => {
-            if (er3) {
-              cb(er3.code === "ENOENT" ? null : er);
-            } else if (stats.isDirectory()) {
-              rmdir(p, options, er, cb);
-            } else {
-              options.unlink(p, cb);
-            }
-          });
-        }
-      });
-    }
-    function fixWinEPERMSync(p, options, er) {
-      let stats;
-      assert(p);
-      assert(options);
-      if (er) {
-        assert(er instanceof Error);
-      }
-      try {
-        options.chmodSync(p, 438);
-      } catch (er2) {
-        if (er2.code === "ENOENT") {
-          return;
-        } else {
-          throw er;
-        }
-      }
-      try {
-        stats = options.statSync(p);
-      } catch (er3) {
-        if (er3.code === "ENOENT") {
-          return;
-        } else {
-          throw er;
-        }
-      }
-      if (stats.isDirectory()) {
-        rmdirSync(p, options, er);
-      } else {
-        options.unlinkSync(p);
-      }
-    }
-    function rmdir(p, options, originalEr, cb) {
-      assert(p);
-      assert(options);
-      if (originalEr) {
-        assert(originalEr instanceof Error);
-      }
-      assert(typeof cb === "function");
-      options.rmdir(p, (er) => {
-        if (er && (er.code === "ENOTEMPTY" || er.code === "EEXIST" || er.code === "EPERM")) {
-          rmkids(p, options, cb);
-        } else if (er && er.code === "ENOTDIR") {
-          cb(originalEr);
-        } else {
-          cb(er);
-        }
-      });
-    }
-    function rmkids(p, options, cb) {
-      assert(p);
-      assert(options);
-      assert(typeof cb === "function");
-      options.readdir(p, (er, files) => {
-        if (er) return cb(er);
-        let n = files.length;
-        let errState;
-        if (n === 0) return options.rmdir(p, cb);
-        files.forEach((f) => {
-          rimraf(path2.join(p, f), options, (er2) => {
-            if (errState) {
-              return;
-            }
-            if (er2) return cb(errState = er2);
-            if (--n === 0) {
-              options.rmdir(p, cb);
-            }
-          });
-        });
-      });
-    }
-    function rimrafSync(p, options) {
-      let st;
-      options = options || {};
-      defaults(options);
-      assert(p, "rimraf: missing path");
-      assert.strictEqual(typeof p, "string", "rimraf: path should be a string");
-      assert(options, "rimraf: missing options");
-      assert.strictEqual(typeof options, "object", "rimraf: options should be object");
-      try {
-        st = options.lstatSync(p);
-      } catch (er) {
-        if (er.code === "ENOENT") {
-          return;
-        }
-        if (er.code === "EPERM" && isWindows) {
-          fixWinEPERMSync(p, options, er);
-        }
-      }
-      try {
-        if (st && st.isDirectory()) {
-          rmdirSync(p, options, null);
-        } else {
-          options.unlinkSync(p);
-        }
-      } catch (er) {
-        if (er.code === "ENOENT") {
-          return;
-        } else if (er.code === "EPERM") {
-          return isWindows ? fixWinEPERMSync(p, options, er) : rmdirSync(p, options, er);
-        } else if (er.code !== "EISDIR") {
-          throw er;
-        }
-        rmdirSync(p, options, er);
-      }
-    }
-    function rmdirSync(p, options, originalEr) {
-      assert(p);
-      assert(options);
-      if (originalEr) {
-        assert(originalEr instanceof Error);
-      }
-      try {
-        options.rmdirSync(p);
-      } catch (er) {
-        if (er.code === "ENOTDIR") {
-          throw originalEr;
-        } else if (er.code === "ENOTEMPTY" || er.code === "EEXIST" || er.code === "EPERM") {
-          rmkidsSync(p, options);
-        } else if (er.code !== "ENOENT") {
-          throw er;
-        }
-      }
-    }
-    function rmkidsSync(p, options) {
-      assert(p);
-      assert(options);
-      options.readdirSync(p).forEach((f) => rimrafSync(path2.join(p, f), options));
-      if (isWindows) {
-        const startTime = Date.now();
-        do {
-          try {
-            const ret = options.rmdirSync(p, options);
-            return ret;
-          } catch (er) {
-          }
-        } while (Date.now() - startTime < 500);
-      } else {
-        const ret = options.rmdirSync(p, options);
-        return ret;
-      }
-    }
-    module2.exports = rimraf;
-    rimraf.sync = rimrafSync;
-  }
-});
-
-// ../../../../../../node_modules/fs-extra/lib/remove/index.js
-var require_remove = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/remove/index.js"(exports2, module2) {
-    "use strict";
-    var u = require_universalify().fromCallback;
-    var rimraf = require_rimraf();
-    module2.exports = {
-      remove: u(rimraf),
-      removeSync: rimraf.sync
-    };
-  }
-});
-
-// ../../../../../../node_modules/fs-extra/lib/empty/index.js
-var require_empty = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/empty/index.js"(exports2, module2) {
-    "use strict";
-    var u = require_universalify().fromCallback;
-    var fs2 = require_graceful_fs();
-    var path2 = require("path");
-    var mkdir = require_mkdirs2();
+    var mkdir = require_mkdirs();
     var remove = require_remove();
-    var emptyDir = u(function emptyDir2(dir, callback) {
-      callback = callback || function() {
-      };
-      fs2.readdir(dir, (err, items) => {
-        if (err) return mkdir.mkdirs(dir, callback);
-        items = items.map((item) => path2.join(dir, item));
-        deleteItem();
-        function deleteItem() {
-          const item = items.pop();
-          if (!item) return callback();
-          remove.remove(item, (err2) => {
-            if (err2) return callback(err2);
-            deleteItem();
-          });
-        }
-      });
+    var emptyDir = u(async function emptyDir2(dir) {
+      let items;
+      try {
+        items = await fs2.readdir(dir);
+      } catch {
+        return mkdir.mkdirs(dir);
+      }
+      return Promise.all(items.map((item) => remove.remove(path2.join(dir, item))));
     });
     function emptyDirSync(dir) {
       let items;
       try {
         items = fs2.readdirSync(dir);
-      } catch (err) {
+      } catch {
         return mkdir.mkdirsSync(dir);
       }
       items.forEach((item) => {
@@ -1982,45 +1517,55 @@ var require_empty = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/ensure/file.js
+// node_modules/fs-extra/lib/ensure/file.js
 var require_file = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/ensure/file.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/file.js"(exports2, module2) {
     "use strict";
-    var u = require_universalify().fromCallback;
+    var u = require_universalify().fromPromise;
     var path2 = require("path");
-    var fs2 = require_graceful_fs();
-    var mkdir = require_mkdirs2();
-    var pathExists = require_path_exists().pathExists;
-    function createFile(file, callback) {
-      function makeFile() {
-        fs2.writeFile(file, "", (err) => {
-          if (err) return callback(err);
-          callback();
-        });
+    var fs2 = require_fs();
+    var mkdir = require_mkdirs();
+    async function createFile(file) {
+      let stats;
+      try {
+        stats = await fs2.stat(file);
+      } catch {
       }
-      fs2.stat(file, (err, stats) => {
-        if (!err && stats.isFile()) return callback();
-        const dir = path2.dirname(file);
-        pathExists(dir, (err2, dirExists) => {
-          if (err2) return callback(err2);
-          if (dirExists) return makeFile();
-          mkdir.mkdirs(dir, (err3) => {
-            if (err3) return callback(err3);
-            makeFile();
-          });
-        });
-      });
+      if (stats && stats.isFile()) return;
+      const dir = path2.dirname(file);
+      let dirStats = null;
+      try {
+        dirStats = await fs2.stat(dir);
+      } catch (err) {
+        if (err.code === "ENOENT") {
+          await mkdir.mkdirs(dir);
+          await fs2.writeFile(file, "");
+          return;
+        } else {
+          throw err;
+        }
+      }
+      if (dirStats.isDirectory()) {
+        await fs2.writeFile(file, "");
+      } else {
+        await fs2.readdir(dir);
+      }
     }
     function createFileSync(file) {
       let stats;
       try {
         stats = fs2.statSync(file);
-      } catch (e) {
+      } catch {
       }
       if (stats && stats.isFile()) return;
       const dir = path2.dirname(file);
-      if (!fs2.existsSync(dir)) {
-        mkdir.mkdirsSync(dir);
+      try {
+        if (!fs2.statSync(dir).isDirectory()) {
+          fs2.readdirSync(dir);
+        }
+      } catch (err) {
+        if (err && err.code === "ENOENT") mkdir.mkdirsSync(dir);
+        else throw err;
       }
       fs2.writeFileSync(file, "");
     }
@@ -2031,47 +1576,46 @@ var require_file = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/ensure/link.js
+// node_modules/fs-extra/lib/ensure/link.js
 var require_link = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/ensure/link.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/link.js"(exports2, module2) {
     "use strict";
-    var u = require_universalify().fromCallback;
+    var u = require_universalify().fromPromise;
     var path2 = require("path");
-    var fs2 = require_graceful_fs();
-    var mkdir = require_mkdirs2();
-    var pathExists = require_path_exists().pathExists;
-    function createLink(srcpath, dstpath, callback) {
-      function makeLink(srcpath2, dstpath2) {
-        fs2.link(srcpath2, dstpath2, (err) => {
-          if (err) return callback(err);
-          callback(null);
-        });
+    var fs2 = require_fs();
+    var mkdir = require_mkdirs();
+    var { pathExists } = require_path_exists();
+    var { areIdentical } = require_stat();
+    async function createLink(srcpath, dstpath) {
+      let dstStat;
+      try {
+        dstStat = await fs2.lstat(dstpath);
+      } catch {
       }
-      pathExists(dstpath, (err, destinationExists) => {
-        if (err) return callback(err);
-        if (destinationExists) return callback(null);
-        fs2.lstat(srcpath, (err2) => {
-          if (err2) {
-            err2.message = err2.message.replace("lstat", "ensureLink");
-            return callback(err2);
-          }
-          const dir = path2.dirname(dstpath);
-          pathExists(dir, (err3, dirExists) => {
-            if (err3) return callback(err3);
-            if (dirExists) return makeLink(srcpath, dstpath);
-            mkdir.mkdirs(dir, (err4) => {
-              if (err4) return callback(err4);
-              makeLink(srcpath, dstpath);
-            });
-          });
-        });
-      });
+      let srcStat;
+      try {
+        srcStat = await fs2.lstat(srcpath);
+      } catch (err) {
+        err.message = err.message.replace("lstat", "ensureLink");
+        throw err;
+      }
+      if (dstStat && areIdentical(srcStat, dstStat)) return;
+      const dir = path2.dirname(dstpath);
+      const dirExists = await pathExists(dir);
+      if (!dirExists) {
+        await mkdir.mkdirs(dir);
+      }
+      await fs2.link(srcpath, dstpath);
     }
     function createLinkSync(srcpath, dstpath) {
-      const destinationExists = fs2.existsSync(dstpath);
-      if (destinationExists) return void 0;
+      let dstStat;
       try {
-        fs2.lstatSync(srcpath);
+        dstStat = fs2.lstatSync(dstpath);
+      } catch {
+      }
+      try {
+        const srcStat = fs2.lstatSync(srcpath);
+        if (dstStat && areIdentical(srcStat, dstStat)) return;
       } catch (err) {
         err.message = err.message.replace("lstat", "ensureLink");
         throw err;
@@ -2089,161 +1633,157 @@ var require_link = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/ensure/symlink-paths.js
+// node_modules/fs-extra/lib/ensure/symlink-paths.js
 var require_symlink_paths = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports2, module2) {
     "use strict";
     var path2 = require("path");
-    var fs2 = require_graceful_fs();
-    var pathExists = require_path_exists().pathExists;
-    function symlinkPaths(srcpath, dstpath, callback) {
+    var fs2 = require_fs();
+    var { pathExists } = require_path_exists();
+    var u = require_universalify().fromPromise;
+    async function symlinkPaths(srcpath, dstpath) {
       if (path2.isAbsolute(srcpath)) {
-        return fs2.lstat(srcpath, (err) => {
-          if (err) {
-            err.message = err.message.replace("lstat", "ensureSymlink");
-            return callback(err);
-          }
-          return callback(null, {
-            "toCwd": srcpath,
-            "toDst": srcpath
-          });
-        });
-      } else {
-        const dstdir = path2.dirname(dstpath);
-        const relativeToDst = path2.join(dstdir, srcpath);
-        return pathExists(relativeToDst, (err, exists) => {
-          if (err) return callback(err);
-          if (exists) {
-            return callback(null, {
-              "toCwd": relativeToDst,
-              "toDst": srcpath
-            });
-          } else {
-            return fs2.lstat(srcpath, (err2) => {
-              if (err2) {
-                err2.message = err2.message.replace("lstat", "ensureSymlink");
-                return callback(err2);
-              }
-              return callback(null, {
-                "toCwd": srcpath,
-                "toDst": path2.relative(dstdir, srcpath)
-              });
-            });
-          }
-        });
+        try {
+          await fs2.lstat(srcpath);
+        } catch (err) {
+          err.message = err.message.replace("lstat", "ensureSymlink");
+          throw err;
+        }
+        return {
+          toCwd: srcpath,
+          toDst: srcpath
+        };
       }
+      const dstdir = path2.dirname(dstpath);
+      const relativeToDst = path2.join(dstdir, srcpath);
+      const exists = await pathExists(relativeToDst);
+      if (exists) {
+        return {
+          toCwd: relativeToDst,
+          toDst: srcpath
+        };
+      }
+      try {
+        await fs2.lstat(srcpath);
+      } catch (err) {
+        err.message = err.message.replace("lstat", "ensureSymlink");
+        throw err;
+      }
+      return {
+        toCwd: srcpath,
+        toDst: path2.relative(dstdir, srcpath)
+      };
     }
     function symlinkPathsSync(srcpath, dstpath) {
-      let exists;
       if (path2.isAbsolute(srcpath)) {
-        exists = fs2.existsSync(srcpath);
-        if (!exists) throw new Error("absolute srcpath does not exist");
+        const exists2 = fs2.existsSync(srcpath);
+        if (!exists2) throw new Error("absolute srcpath does not exist");
         return {
-          "toCwd": srcpath,
-          "toDst": srcpath
+          toCwd: srcpath,
+          toDst: srcpath
         };
-      } else {
-        const dstdir = path2.dirname(dstpath);
-        const relativeToDst = path2.join(dstdir, srcpath);
-        exists = fs2.existsSync(relativeToDst);
-        if (exists) {
-          return {
-            "toCwd": relativeToDst,
-            "toDst": srcpath
-          };
-        } else {
-          exists = fs2.existsSync(srcpath);
-          if (!exists) throw new Error("relative srcpath does not exist");
-          return {
-            "toCwd": srcpath,
-            "toDst": path2.relative(dstdir, srcpath)
-          };
-        }
       }
+      const dstdir = path2.dirname(dstpath);
+      const relativeToDst = path2.join(dstdir, srcpath);
+      const exists = fs2.existsSync(relativeToDst);
+      if (exists) {
+        return {
+          toCwd: relativeToDst,
+          toDst: srcpath
+        };
+      }
+      const srcExists = fs2.existsSync(srcpath);
+      if (!srcExists) throw new Error("relative srcpath does not exist");
+      return {
+        toCwd: srcpath,
+        toDst: path2.relative(dstdir, srcpath)
+      };
     }
     module2.exports = {
-      symlinkPaths,
+      symlinkPaths: u(symlinkPaths),
       symlinkPathsSync
     };
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/ensure/symlink-type.js
+// node_modules/fs-extra/lib/ensure/symlink-type.js
 var require_symlink_type = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/ensure/symlink-type.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/symlink-type.js"(exports2, module2) {
     "use strict";
-    var fs2 = require_graceful_fs();
-    function symlinkType(srcpath, type, callback) {
-      callback = typeof type === "function" ? type : callback;
-      type = typeof type === "function" ? false : type;
-      if (type) return callback(null, type);
-      fs2.lstat(srcpath, (err, stats) => {
-        if (err) return callback(null, "file");
-        type = stats && stats.isDirectory() ? "dir" : "file";
-        callback(null, type);
-      });
+    var fs2 = require_fs();
+    var u = require_universalify().fromPromise;
+    async function symlinkType(srcpath, type) {
+      if (type) return type;
+      let stats;
+      try {
+        stats = await fs2.lstat(srcpath);
+      } catch {
+        return "file";
+      }
+      return stats && stats.isDirectory() ? "dir" : "file";
     }
     function symlinkTypeSync(srcpath, type) {
-      let stats;
       if (type) return type;
+      let stats;
       try {
         stats = fs2.lstatSync(srcpath);
-      } catch (e) {
+      } catch {
         return "file";
       }
       return stats && stats.isDirectory() ? "dir" : "file";
     }
     module2.exports = {
-      symlinkType,
+      symlinkType: u(symlinkType),
       symlinkTypeSync
     };
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/ensure/symlink.js
+// node_modules/fs-extra/lib/ensure/symlink.js
 var require_symlink = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/ensure/symlink.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/symlink.js"(exports2, module2) {
     "use strict";
-    var u = require_universalify().fromCallback;
+    var u = require_universalify().fromPromise;
     var path2 = require("path");
-    var fs2 = require_graceful_fs();
-    var _mkdirs = require_mkdirs2();
-    var mkdirs = _mkdirs.mkdirs;
-    var mkdirsSync = _mkdirs.mkdirsSync;
-    var _symlinkPaths = require_symlink_paths();
-    var symlinkPaths = _symlinkPaths.symlinkPaths;
-    var symlinkPathsSync = _symlinkPaths.symlinkPathsSync;
-    var _symlinkType = require_symlink_type();
-    var symlinkType = _symlinkType.symlinkType;
-    var symlinkTypeSync = _symlinkType.symlinkTypeSync;
-    var pathExists = require_path_exists().pathExists;
-    function createSymlink(srcpath, dstpath, type, callback) {
-      callback = typeof type === "function" ? type : callback;
-      type = typeof type === "function" ? false : type;
-      pathExists(dstpath, (err, destinationExists) => {
-        if (err) return callback(err);
-        if (destinationExists) return callback(null);
-        symlinkPaths(srcpath, dstpath, (err2, relative) => {
-          if (err2) return callback(err2);
-          srcpath = relative.toDst;
-          symlinkType(relative.toCwd, type, (err3, type2) => {
-            if (err3) return callback(err3);
-            const dir = path2.dirname(dstpath);
-            pathExists(dir, (err4, dirExists) => {
-              if (err4) return callback(err4);
-              if (dirExists) return fs2.symlink(srcpath, dstpath, type2, callback);
-              mkdirs(dir, (err5) => {
-                if (err5) return callback(err5);
-                fs2.symlink(srcpath, dstpath, type2, callback);
-              });
-            });
-          });
-        });
-      });
+    var fs2 = require_fs();
+    var { mkdirs, mkdirsSync } = require_mkdirs();
+    var { symlinkPaths, symlinkPathsSync } = require_symlink_paths();
+    var { symlinkType, symlinkTypeSync } = require_symlink_type();
+    var { pathExists } = require_path_exists();
+    var { areIdentical } = require_stat();
+    async function createSymlink(srcpath, dstpath, type) {
+      let stats;
+      try {
+        stats = await fs2.lstat(dstpath);
+      } catch {
+      }
+      if (stats && stats.isSymbolicLink()) {
+        const [srcStat, dstStat] = await Promise.all([
+          fs2.stat(srcpath),
+          fs2.stat(dstpath)
+        ]);
+        if (areIdentical(srcStat, dstStat)) return;
+      }
+      const relative = await symlinkPaths(srcpath, dstpath);
+      srcpath = relative.toDst;
+      const toType = await symlinkType(relative.toCwd, type);
+      const dir = path2.dirname(dstpath);
+      if (!await pathExists(dir)) {
+        await mkdirs(dir);
+      }
+      return fs2.symlink(srcpath, dstpath, toType);
     }
     function createSymlinkSync(srcpath, dstpath, type) {
-      const destinationExists = fs2.existsSync(dstpath);
-      if (destinationExists) return void 0;
+      let stats;
+      try {
+        stats = fs2.lstatSync(dstpath);
+      } catch {
+      }
+      if (stats && stats.isSymbolicLink()) {
+        const srcStat = fs2.statSync(srcpath);
+        const dstStat = fs2.statSync(dstpath);
+        if (areIdentical(srcStat, dstStat)) return;
+      }
       const relative = symlinkPathsSync(srcpath, dstpath);
       srcpath = relative.toDst;
       type = symlinkTypeSync(relative.toCwd, type);
@@ -2260,136 +1800,111 @@ var require_symlink = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/ensure/index.js
+// node_modules/fs-extra/lib/ensure/index.js
 var require_ensure = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/ensure/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/ensure/index.js"(exports2, module2) {
     "use strict";
-    var file = require_file();
-    var link = require_link();
-    var symlink = require_symlink();
+    var { createFile, createFileSync } = require_file();
+    var { createLink, createLinkSync } = require_link();
+    var { createSymlink, createSymlinkSync } = require_symlink();
     module2.exports = {
       // file
-      createFile: file.createFile,
-      createFileSync: file.createFileSync,
-      ensureFile: file.createFile,
-      ensureFileSync: file.createFileSync,
+      createFile,
+      createFileSync,
+      ensureFile: createFile,
+      ensureFileSync: createFileSync,
       // link
-      createLink: link.createLink,
-      createLinkSync: link.createLinkSync,
-      ensureLink: link.createLink,
-      ensureLinkSync: link.createLinkSync,
+      createLink,
+      createLinkSync,
+      ensureLink: createLink,
+      ensureLinkSync: createLinkSync,
       // symlink
-      createSymlink: symlink.createSymlink,
-      createSymlinkSync: symlink.createSymlinkSync,
-      ensureSymlink: symlink.createSymlink,
-      ensureSymlinkSync: symlink.createSymlinkSync
+      createSymlink,
+      createSymlinkSync,
+      ensureSymlink: createSymlink,
+      ensureSymlinkSync: createSymlinkSync
     };
   }
 });
 
-// ../../../../../../node_modules/jsonfile/index.js
+// node_modules/jsonfile/utils.js
+var require_utils2 = __commonJS({
+  "node_modules/jsonfile/utils.js"(exports2, module2) {
+    function stringify(obj, { EOL = "\n", finalEOL = true, replacer = null, spaces } = {}) {
+      const EOF = finalEOL ? EOL : "";
+      const str = JSON.stringify(obj, replacer, spaces);
+      return str.replace(/\n/g, EOL) + EOF;
+    }
+    function stripBom(content) {
+      if (Buffer.isBuffer(content)) content = content.toString("utf8");
+      return content.replace(/^\uFEFF/, "");
+    }
+    module2.exports = { stringify, stripBom };
+  }
+});
+
+// node_modules/jsonfile/index.js
 var require_jsonfile = __commonJS({
-  "../../../../../../node_modules/jsonfile/index.js"(exports2, module2) {
+  "node_modules/jsonfile/index.js"(exports2, module2) {
     var _fs;
     try {
       _fs = require_graceful_fs();
     } catch (_) {
       _fs = require("fs");
     }
-    function readFile(file, options, callback) {
-      if (callback == null) {
-        callback = options;
-        options = {};
-      }
+    var universalify = require_universalify();
+    var { stringify, stripBom } = require_utils2();
+    async function _readFile(file, options = {}) {
       if (typeof options === "string") {
         options = { encoding: options };
       }
-      options = options || {};
-      var fs2 = options.fs || _fs;
-      var shouldThrow = true;
-      if ("throws" in options) {
-        shouldThrow = options.throws;
-      }
-      fs2.readFile(file, options, function(err, data) {
-        if (err) return callback(err);
-        data = stripBom(data);
-        var obj;
-        try {
-          obj = JSON.parse(data, options ? options.reviver : null);
-        } catch (err2) {
-          if (shouldThrow) {
-            err2.message = file + ": " + err2.message;
-            return callback(err2);
-          } else {
-            return callback(null, null);
-          }
-        }
-        callback(null, obj);
-      });
-    }
-    function readFileSync(file, options) {
-      options = options || {};
-      if (typeof options === "string") {
-        options = { encoding: options };
-      }
-      var fs2 = options.fs || _fs;
-      var shouldThrow = true;
-      if ("throws" in options) {
-        shouldThrow = options.throws;
-      }
+      const fs2 = options.fs || _fs;
+      const shouldThrow = "throws" in options ? options.throws : true;
+      let data = await universalify.fromCallback(fs2.readFile)(file, options);
+      data = stripBom(data);
+      let obj;
       try {
-        var content = fs2.readFileSync(file, options);
+        obj = JSON.parse(data, options ? options.reviver : null);
+      } catch (err) {
+        if (shouldThrow) {
+          err.message = `${file}: ${err.message}`;
+          throw err;
+        } else {
+          return null;
+        }
+      }
+      return obj;
+    }
+    var readFile = universalify.fromPromise(_readFile);
+    function readFileSync(file, options = {}) {
+      if (typeof options === "string") {
+        options = { encoding: options };
+      }
+      const fs2 = options.fs || _fs;
+      const shouldThrow = "throws" in options ? options.throws : true;
+      try {
+        let content = fs2.readFileSync(file, options);
         content = stripBom(content);
         return JSON.parse(content, options.reviver);
       } catch (err) {
         if (shouldThrow) {
-          err.message = file + ": " + err.message;
+          err.message = `${file}: ${err.message}`;
           throw err;
         } else {
           return null;
         }
       }
     }
-    function stringify(obj, options) {
-      var spaces;
-      var EOL = "\n";
-      if (typeof options === "object" && options !== null) {
-        if (options.spaces) {
-          spaces = options.spaces;
-        }
-        if (options.EOL) {
-          EOL = options.EOL;
-        }
-      }
-      var str = JSON.stringify(obj, options ? options.replacer : null, spaces);
-      return str.replace(/\n/g, EOL) + EOL;
+    async function _writeFile(file, obj, options = {}) {
+      const fs2 = options.fs || _fs;
+      const str = stringify(obj, options);
+      await universalify.fromCallback(fs2.writeFile)(file, str, options);
     }
-    function writeFile(file, obj, options, callback) {
-      if (callback == null) {
-        callback = options;
-        options = {};
-      }
-      options = options || {};
-      var fs2 = options.fs || _fs;
-      var str = "";
-      try {
-        str = stringify(obj, options);
-      } catch (err) {
-        if (callback) callback(err, null);
-        return;
-      }
-      fs2.writeFile(file, str, options, callback);
-    }
-    function writeFileSync(file, obj, options) {
-      options = options || {};
-      var fs2 = options.fs || _fs;
-      var str = stringify(obj, options);
+    var writeFile = universalify.fromPromise(_writeFile);
+    function writeFileSync(file, obj, options = {}) {
+      const fs2 = options.fs || _fs;
+      const str = stringify(obj, options);
       return fs2.writeFileSync(file, str, options);
-    }
-    function stripBom(content) {
-      if (Buffer.isBuffer(content)) content = content.toString("utf8");
-      content = content.replace(/^\uFEFF/, "");
-      return content;
     }
     var jsonfile = {
       readFile,
@@ -2401,73 +1916,84 @@ var require_jsonfile = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/json/jsonfile.js
+// node_modules/fs-extra/lib/json/jsonfile.js
 var require_jsonfile2 = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/json/jsonfile.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/json/jsonfile.js"(exports2, module2) {
     "use strict";
-    var u = require_universalify().fromCallback;
     var jsonFile = require_jsonfile();
     module2.exports = {
       // jsonfile exports
-      readJson: u(jsonFile.readFile),
+      readJson: jsonFile.readFile,
       readJsonSync: jsonFile.readFileSync,
-      writeJson: u(jsonFile.writeFile),
+      writeJson: jsonFile.writeFile,
       writeJsonSync: jsonFile.writeFileSync
     };
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/json/output-json.js
-var require_output_json = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/json/output-json.js"(exports2, module2) {
+// node_modules/fs-extra/lib/output-file/index.js
+var require_output_file = __commonJS({
+  "node_modules/fs-extra/lib/output-file/index.js"(exports2, module2) {
     "use strict";
+    var u = require_universalify().fromPromise;
+    var fs2 = require_fs();
     var path2 = require("path");
-    var mkdir = require_mkdirs2();
+    var mkdir = require_mkdirs();
     var pathExists = require_path_exists().pathExists;
-    var jsonFile = require_jsonfile2();
-    function outputJson(file, data, options, callback) {
-      if (typeof options === "function") {
-        callback = options;
-        options = {};
-      }
+    async function outputFile(file, data, encoding = "utf-8") {
       const dir = path2.dirname(file);
-      pathExists(dir, (err, itDoes) => {
-        if (err) return callback(err);
-        if (itDoes) return jsonFile.writeJson(file, data, options, callback);
-        mkdir.mkdirs(dir, (err2) => {
-          if (err2) return callback(err2);
-          jsonFile.writeJson(file, data, options, callback);
-        });
-      });
+      if (!await pathExists(dir)) {
+        await mkdir.mkdirs(dir);
+      }
+      return fs2.writeFile(file, data, encoding);
+    }
+    function outputFileSync(file, ...args) {
+      const dir = path2.dirname(file);
+      if (!fs2.existsSync(dir)) {
+        mkdir.mkdirsSync(dir);
+      }
+      fs2.writeFileSync(file, ...args);
+    }
+    module2.exports = {
+      outputFile: u(outputFile),
+      outputFileSync
+    };
+  }
+});
+
+// node_modules/fs-extra/lib/json/output-json.js
+var require_output_json = __commonJS({
+  "node_modules/fs-extra/lib/json/output-json.js"(exports2, module2) {
+    "use strict";
+    var { stringify } = require_utils2();
+    var { outputFile } = require_output_file();
+    async function outputJson(file, data, options = {}) {
+      const str = stringify(data, options);
+      await outputFile(file, str, options);
     }
     module2.exports = outputJson;
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/json/output-json-sync.js
+// node_modules/fs-extra/lib/json/output-json-sync.js
 var require_output_json_sync = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/json/output-json-sync.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/json/output-json-sync.js"(exports2, module2) {
     "use strict";
-    var fs2 = require_graceful_fs();
-    var path2 = require("path");
-    var mkdir = require_mkdirs2();
-    var jsonFile = require_jsonfile2();
+    var { stringify } = require_utils2();
+    var { outputFileSync } = require_output_file();
     function outputJsonSync(file, data, options) {
-      const dir = path2.dirname(file);
-      if (!fs2.existsSync(dir)) {
-        mkdir.mkdirsSync(dir);
-      }
-      jsonFile.writeJsonSync(file, data, options);
+      const str = stringify(data, options);
+      outputFileSync(file, str, options);
     }
     module2.exports = outputJsonSync;
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/json/index.js
+// node_modules/fs-extra/lib/json/index.js
 var require_json = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/json/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/json/index.js"(exports2, module2) {
     "use strict";
-    var u = require_universalify().fromCallback;
+    var u = require_universalify().fromPromise;
     var jsonFile = require_jsonfile2();
     jsonFile.outputJson = u(require_output_json());
     jsonFile.outputJsonSync = require_output_json_sync();
@@ -2481,25 +2007,83 @@ var require_json = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/move-sync/move-sync.js
+// node_modules/fs-extra/lib/move/move.js
+var require_move = __commonJS({
+  "node_modules/fs-extra/lib/move/move.js"(exports2, module2) {
+    "use strict";
+    var fs2 = require_fs();
+    var path2 = require("path");
+    var { copy } = require_copy2();
+    var { remove } = require_remove();
+    var { mkdirp } = require_mkdirs();
+    var { pathExists } = require_path_exists();
+    var stat = require_stat();
+    async function move(src, dest, opts = {}) {
+      const overwrite = opts.overwrite || opts.clobber || false;
+      const { srcStat, isChangingCase = false } = await stat.checkPaths(src, dest, "move", opts);
+      await stat.checkParentPaths(src, srcStat, dest, "move");
+      const destParent = path2.dirname(dest);
+      const parsedParentPath = path2.parse(destParent);
+      if (parsedParentPath.root !== destParent) {
+        await mkdirp(destParent);
+      }
+      return doRename(src, dest, overwrite, isChangingCase);
+    }
+    async function doRename(src, dest, overwrite, isChangingCase) {
+      if (!isChangingCase) {
+        if (overwrite) {
+          await remove(dest);
+        } else if (await pathExists(dest)) {
+          throw new Error("dest already exists.");
+        }
+      }
+      try {
+        await fs2.rename(src, dest);
+      } catch (err) {
+        if (err.code !== "EXDEV") {
+          throw err;
+        }
+        await moveAcrossDevice(src, dest, overwrite);
+      }
+    }
+    async function moveAcrossDevice(src, dest, overwrite) {
+      const opts = {
+        overwrite,
+        errorOnExist: true,
+        preserveTimestamps: true
+      };
+      await copy(src, dest, opts);
+      return remove(src);
+    }
+    module2.exports = move;
+  }
+});
+
+// node_modules/fs-extra/lib/move/move-sync.js
 var require_move_sync = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/move-sync/move-sync.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/move/move-sync.js"(exports2, module2) {
     "use strict";
     var fs2 = require_graceful_fs();
     var path2 = require("path");
-    var copySync = require_copy_sync2().copySync;
+    var copySync = require_copy2().copySync;
     var removeSync = require_remove().removeSync;
-    var mkdirpSync = require_mkdirs2().mkdirpSync;
+    var mkdirpSync = require_mkdirs().mkdirpSync;
     var stat = require_stat();
     function moveSync(src, dest, opts) {
       opts = opts || {};
       const overwrite = opts.overwrite || opts.clobber || false;
-      const { srcStat } = stat.checkPathsSync(src, dest, "move");
+      const { srcStat, isChangingCase = false } = stat.checkPathsSync(src, dest, "move", opts);
       stat.checkParentPathsSync(src, srcStat, dest, "move");
-      mkdirpSync(path2.dirname(dest));
-      return doRename(src, dest, overwrite);
+      if (!isParentRoot(dest)) mkdirpSync(path2.dirname(dest));
+      return doRename(src, dest, overwrite, isChangingCase);
     }
-    function doRename(src, dest, overwrite) {
+    function isParentRoot(dest) {
+      const parent = path2.dirname(dest);
+      const parsedPath = path2.parse(parent);
+      return parsedPath.root === parent;
+    }
+    function doRename(src, dest, overwrite, isChangingCase) {
+      if (isChangingCase) return rename(src, dest, overwrite);
       if (overwrite) {
         removeSync(dest);
         return rename(src, dest, overwrite);
@@ -2518,7 +2102,8 @@ var require_move_sync = __commonJS({
     function moveAcrossDevice(src, dest, overwrite) {
       const opts = {
         overwrite,
-        errorOnExist: true
+        errorOnExist: true,
+        preserveTimestamps: true
       };
       copySync(src, dest, opts);
       return removeSync(src);
@@ -2527,163 +2112,41 @@ var require_move_sync = __commonJS({
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/move-sync/index.js
-var require_move_sync2 = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/move-sync/index.js"(exports2, module2) {
+// node_modules/fs-extra/lib/move/index.js
+var require_move2 = __commonJS({
+  "node_modules/fs-extra/lib/move/index.js"(exports2, module2) {
     "use strict";
+    var u = require_universalify().fromPromise;
     module2.exports = {
+      move: u(require_move()),
       moveSync: require_move_sync()
     };
   }
 });
 
-// ../../../../../../node_modules/fs-extra/lib/move/move.js
-var require_move = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/move/move.js"(exports2, module2) {
-    "use strict";
-    var fs2 = require_graceful_fs();
-    var path2 = require("path");
-    var copy = require_copy2().copy;
-    var remove = require_remove().remove;
-    var mkdirp = require_mkdirs2().mkdirp;
-    var pathExists = require_path_exists().pathExists;
-    var stat = require_stat();
-    function move(src, dest, opts, cb) {
-      if (typeof opts === "function") {
-        cb = opts;
-        opts = {};
-      }
-      const overwrite = opts.overwrite || opts.clobber || false;
-      stat.checkPaths(src, dest, "move", (err, stats) => {
-        if (err) return cb(err);
-        const { srcStat } = stats;
-        stat.checkParentPaths(src, srcStat, dest, "move", (err2) => {
-          if (err2) return cb(err2);
-          mkdirp(path2.dirname(dest), (err3) => {
-            if (err3) return cb(err3);
-            return doRename(src, dest, overwrite, cb);
-          });
-        });
-      });
-    }
-    function doRename(src, dest, overwrite, cb) {
-      if (overwrite) {
-        return remove(dest, (err) => {
-          if (err) return cb(err);
-          return rename(src, dest, overwrite, cb);
-        });
-      }
-      pathExists(dest, (err, destExists) => {
-        if (err) return cb(err);
-        if (destExists) return cb(new Error("dest already exists."));
-        return rename(src, dest, overwrite, cb);
-      });
-    }
-    function rename(src, dest, overwrite, cb) {
-      fs2.rename(src, dest, (err) => {
-        if (!err) return cb();
-        if (err.code !== "EXDEV") return cb(err);
-        return moveAcrossDevice(src, dest, overwrite, cb);
-      });
-    }
-    function moveAcrossDevice(src, dest, overwrite, cb) {
-      const opts = {
-        overwrite,
-        errorOnExist: true
-      };
-      copy(src, dest, opts, (err) => {
-        if (err) return cb(err);
-        return remove(src, cb);
-      });
-    }
-    module2.exports = move;
-  }
-});
-
-// ../../../../../../node_modules/fs-extra/lib/move/index.js
-var require_move2 = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/move/index.js"(exports2, module2) {
-    "use strict";
-    var u = require_universalify().fromCallback;
-    module2.exports = {
-      move: u(require_move())
-    };
-  }
-});
-
-// ../../../../../../node_modules/fs-extra/lib/output/index.js
-var require_output = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/output/index.js"(exports2, module2) {
-    "use strict";
-    var u = require_universalify().fromCallback;
-    var fs2 = require_graceful_fs();
-    var path2 = require("path");
-    var mkdir = require_mkdirs2();
-    var pathExists = require_path_exists().pathExists;
-    function outputFile(file, data, encoding, callback) {
-      if (typeof encoding === "function") {
-        callback = encoding;
-        encoding = "utf8";
-      }
-      const dir = path2.dirname(file);
-      pathExists(dir, (err, itDoes) => {
-        if (err) return callback(err);
-        if (itDoes) return fs2.writeFile(file, data, encoding, callback);
-        mkdir.mkdirs(dir, (err2) => {
-          if (err2) return callback(err2);
-          fs2.writeFile(file, data, encoding, callback);
-        });
-      });
-    }
-    function outputFileSync(file, ...args) {
-      const dir = path2.dirname(file);
-      if (fs2.existsSync(dir)) {
-        return fs2.writeFileSync(file, ...args);
-      }
-      mkdir.mkdirsSync(dir);
-      fs2.writeFileSync(file, ...args);
-    }
-    module2.exports = {
-      outputFile: u(outputFile),
-      outputFileSync
-    };
-  }
-});
-
-// ../../../../../../node_modules/fs-extra/lib/index.js
+// node_modules/fs-extra/lib/index.js
 var require_lib = __commonJS({
-  "../../../../../../node_modules/fs-extra/lib/index.js"(exports2, module2) {
+  "node_modules/fs-extra/lib/index.js"(exports2, module2) {
     "use strict";
-    module2.exports = Object.assign(
-      {},
+    module2.exports = {
       // Export promiseified graceful-fs:
-      require_fs(),
+      ...require_fs(),
       // Export extra methods:
-      require_copy_sync2(),
-      require_copy2(),
-      require_empty(),
-      require_ensure(),
-      require_json(),
-      require_mkdirs2(),
-      require_move_sync2(),
-      require_move2(),
-      require_output(),
-      require_path_exists(),
-      require_remove()
-    );
-    var fs2 = require("fs");
-    if (Object.getOwnPropertyDescriptor(fs2, "promises")) {
-      Object.defineProperty(module2.exports, "promises", {
-        get() {
-          return fs2.promises;
-        }
-      });
-    }
+      ...require_copy2(),
+      ...require_empty(),
+      ...require_ensure(),
+      ...require_json(),
+      ...require_mkdirs(),
+      ...require_move2(),
+      ...require_output_file(),
+      ...require_path_exists(),
+      ...require_remove()
+    };
   }
 });
 
 // node_modules/ejs/lib/utils.js
-var require_utils = __commonJS({
+var require_utils3 = __commonJS({
   "node_modules/ejs/lib/utils.js"(exports2) {
     "use strict";
     var regExpChars = /[|\\{}()[\]^$+*?.]/g;
@@ -2870,7 +2333,7 @@ var require_ejs = __commonJS({
     "use strict";
     var fs2 = require("fs");
     var path2 = require("path");
-    var utils = require_utils();
+    var utils = require_utils3();
     var scopeOptionWarned = false;
     var _VERSION_STRING = require_package().version;
     var _DEFAULT_OPEN_DELIMITER = "<";
@@ -3375,17 +2838,21 @@ var require_ejs = __commonJS({
                   }
               }
               switch (this.mode) {
+                // Just executing code
                 case Template.modes.EVAL:
                   this.source += "    ; " + line + "\n";
                   break;
+                // Exec, esc, and output
                 case Template.modes.ESCAPED:
                   this.source += "    ; __append(escapeFn(" + stripSemi(line) + "))\n";
                   break;
+                // Exec and output
                 case Template.modes.RAW:
                   this.source += "    ; __append(" + stripSemi(line) + ")\n";
                   break;
                 case Template.modes.COMMENT:
                   break;
+                // Literal <%% mode, append as raw output
                 case Template.modes.LITERAL:
                   this._addOutput(line);
                   break;
@@ -6463,82 +5930,115 @@ var path = require("path");
 var ejs = require_ejs();
 var readline = require("readline");
 var { exec } = require("child_process");
-var rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+var rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 var askQuestion = (query) => new Promise((resolve) => rl.question(query, resolve));
 var sourceDir = path.join(__dirname, "template");
-var packageJsonPath = path.join(__dirname, "package.json");
+var packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf-8"));
 async function init() {
   try {
     const { default: ora2 } = await Promise.resolve().then(() => (init_ora(), ora_exports));
     const { default: chalk2 } = await Promise.resolve().then(() => (init_source(), source_exports));
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
-    const version = packageJson.version;
-    console.log(chalk2.cyanBright.bold(`Welcome to DeskThing v${version} `));
-    console.log(chalk2.greenBright("Setting up your project... "));
-    console.log();
-    const projectName = await askQuestion("App ID: ");
+    welcomeMessage(chalk2);
+    const projectName = await askQuestion("Enter App ID (lowercase, no spaces): ");
     const destDir = path.join(process.cwd(), projectName);
-    fs.copySync(sourceDir, destDir);
-    const manifestData = {
-      id: projectName.toLowerCase().replace(/\s+/g, "-"),
-      // Generate ID from project name
-      isAudioSource: await getBooleanAnswer("Is this app an audiosource option? (yes/no): "),
-      isScreenSaver: await getBooleanAnswer("Is this app a screensaver option? (yes/no): "),
-      isWebApp: true,
-      isLocalApp: false,
-      requires: (await askQuestion("Comma-separated list of required app IDs (e.g., utility,local,spotify): ")).split(",").map((str) => str.trim()),
-      label: await askQuestion("App Label (display name): "),
-      version,
-      // You can customize this or get it from package.json
-      description: await askQuestion("Description: "),
-      author: await askQuestion("Author: "),
-      platforms: await getPlatforms(),
-      homepage: await askQuestion("Homepage Link: "),
-      repository: await askQuestion("Repository Link: ")
-    };
-    const manifestPath = path.join(destDir, "public", "manifest.json");
-    fs.writeFileSync(manifestPath, JSON.stringify(manifestData, null, 2));
-    const files = fs.readdirSync(destDir, { withFileTypes: true });
-    files.forEach((file) => {
-      const filePath = path.join(destDir, file.name);
-      if (file.isFile() && !file.name.includes("manifest.json")) {
-        renderTemplate(filePath, { projectName });
-      }
-    });
-    console.log(chalk2.green("DeskThing template created successfully at", destDir));
-    console.log(chalk2.blue("Running npm install to set up dependencies..."));
-    const spinner = ora2("Installing dependencies...").start();
-    exec("npm install", { cwd: destDir }, (error, stdout, stderr) => {
-      spinner.stop();
-      if (error) {
-        console.error(chalk2.red("Error running npm install:", stderr));
-        return;
-      }
-      console.log(chalk2.green("Dependencies installed successfully."));
-      console.log(stdout);
-      console.log(chalk2.greenBright("Now do ") + chalk2.bgBlack.bold(`cd ${projectName}`) + chalk2.greenBright(" and start developing!"));
-    });
+    validateProjectName(projectName, destDir);
+    await copyTemplate(sourceDir, destDir);
+    const manifestData = await gatherManifestData(projectName);
+    await createManifest(destDir, manifestData);
+    await replacePlaceholders(destDir, { projectName });
+    console.log(chalk2.green(`DeskThing template created successfully at: ${destDir}`));
+    await installDependencies(destDir, ora2, chalk2);
+    finalInstructions(projectName, chalk2);
   } catch (error) {
     console.error("Error creating template:", error);
   } finally {
     rl.close();
   }
 }
+function welcomeMessage(chalk2) {
+  console.log(chalk2.cyanBright.bold(`Welcome to DeskThing v${packageJson.version}`));
+  console.log(chalk2.greenBright("Let\u2019s set up your new project!\n"));
+}
+function validateProjectName(projectName, destDir) {
+  if (!projectName.match(/^[a-z0-9-]+$/)) {
+    console.error("Invalid App ID: Use lowercase letters, numbers, and hyphens only.");
+    process.exit(1);
+  }
+  if (fs.existsSync(destDir)) {
+    console.error(`Directory "${projectName}" already exists!`);
+    process.exit(1);
+  }
+}
+async function copyTemplate(source, destination) {
+  console.log("Copying template files...");
+  await fs.copy(source, destination);
+  console.log("Template files copied successfully.\n");
+}
+async function gatherManifestData(projectName) {
+  return {
+    id: projectName,
+    isAudioSource: await getBooleanAnswer("Is this app an audio source option? (yes/no): "),
+    isScreenSaver: await getBooleanAnswer("Is this app a screensaver option? (yes/no): "),
+    isWebApp: true,
+    isLocalApp: false,
+    requires: await askList("Required App IDs (comma-separated): "),
+    label: await askQuestion("App Label (Display Name): "),
+    version: packageJson.version,
+    version_code: await askQuestion("App Version Number (e.g., 1.0): "),
+    compatible_server: await askList("Server Compatibility (comma-separated, e.g., 7.3,9): "),
+    compatible_client: await askList("Client Compatibility (comma-separated): "),
+    description: await askQuestion("App Description: "),
+    author: await askQuestion("Author: "),
+    platforms: await askList("Supported Platforms (comma-separated): "),
+    homepage: await askQuestion("Homepage URL (optional): "),
+    repository: await askQuestion("Github Repository URL (optional): ")
+  };
+}
 async function getBooleanAnswer(question) {
   const answer = (await askQuestion(question)).trim().toLowerCase();
   return answer === "yes" || answer === "y";
 }
-async function getPlatforms() {
-  const platforms = await askQuestion("Comma-separated list of supported platforms (e.g., windows,macos,linux): ");
-  return platforms.split(",").map((str) => str.trim());
+async function askList(question) {
+  const answer = await askQuestion(question);
+  return answer ? answer.split(",").map((str) => str.trim()) : [];
 }
-function renderTemplate(filePath, data) {
-  const fileContent = fs.readFileSync(filePath, "utf-8");
-  const rendered = ejs.render(fileContent, data);
-  fs.writeFileSync(filePath, rendered);
+async function createManifest(destDir, manifestData) {
+  const manifestPath = path.join(destDir, "public", "manifest.json");
+  await fs.outputJson(manifestPath, manifestData, { spaces: 2 });
+  console.log("Manifest file created successfully.\n");
+}
+async function replacePlaceholders(destDir, data) {
+  const files = await fs.readdir(destDir, { withFileTypes: true });
+  for (const file of files) {
+    const filePath = path.join(destDir, file.name);
+    if (file.isFile() && !file.name.includes("manifest.json")) {
+      const content = await fs.readFile(filePath, "utf-8");
+      const rendered = ejs.render(content, data);
+      await fs.writeFile(filePath, rendered);
+    }
+  }
+  console.log("Template placeholders replaced successfully.\n");
+}
+async function installDependencies(destDir, ora2, chalk2) {
+  console.log(chalk2.blue("Installing dependencies..."));
+  const spinner = ora2("Running npm install...").start();
+  exec("npm install", { cwd: destDir }, (error, stdout, stderr) => {
+    spinner.stop();
+    if (error) {
+      console.error(chalk2.red("Failed to install dependencies:", stderr));
+      return;
+    }
+    console.log(chalk2.green("Dependencies installed successfully.\n"));
+    console.log(stdout);
+  });
+}
+function finalInstructions(projectName, chalk2) {
+  console.log(
+    chalk2.greenBright("Setup complete! Now run the following commands:")
+  );
+  console.log(chalk2.bgBlack.bold(`  cd ${projectName}`));
+  console.log(chalk2.bgBlack.bold("  npm run dev"));
+  console.log(chalk2.greenBright("\nEnjoy your new DeskThing app!"));
 }
 init();
 /*! Bundled license information:
