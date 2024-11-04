@@ -7,7 +7,7 @@ import ejs from 'ejs';
 import readline from 'readline';
 import { exec } from 'child_process';
 import { templates, TemplateInterface } from './templates';
-import ora, { Ora } from 'ora';
+import ora from 'ora';
 
 interface ManifestData {
   id: string;
