@@ -1,13 +1,17 @@
 {
   "name": "<%= projectName %>",
   "private": true,
-  "version": "0.9.1",
+  "version": "0.10.0",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build && npm run build-server",
     "build-server": "esbuild server/index.ts --bundle --platform=node --outdir=dist/",
+    "build-windows": "vite build && npm run build-server-windows",
+    "build-server-windows": "esbuild server/index.ts --bundle --platform=node --outdir=dist/ && cd dist && powershell -c ren index.js index.cjs && powershell -c compress-archive -path ./* -destinationpath ./${npm_package_name}-app-v${npm_package_version}",
+    "build-and-zip": "npm run build && npm run zip-server-unix",
+    "zip-server-unix": "cd dist && mv index.js index.cjs && zip -r ${npm_package_name}-app-v${npm_package_version}.zip .",
     "setup": "node setup.js",
     "lint": "eslint .",
     "preview": "vite preview"
