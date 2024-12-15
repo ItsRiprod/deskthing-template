@@ -2,7 +2,6 @@
     "id": "deskthingapp",
     "isAudioSource": false,
     "isWebApp": true,
-    "isLocalApp": false,
     "requires": [],
     "label": "",
     "version": "v0.9.1",

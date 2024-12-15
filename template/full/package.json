@@ -6,12 +6,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run build-server",
-    "build-server": "esbuild server/index.ts --bundle --platform=node --outdir=dist/",
-    "build-windows": "vite build && npm run build-server-windows",
-    "build-server-windows": "esbuild server/index.ts --bundle --platform=node --outdir=dist/ && cd dist && powershell -c ren index.js index.cjs && powershell -c compress-archive -path ./* -destinationpath ./${npm_package_name}-app-v${npm_package_version}",
-    "build-and-zip": "npm run build && npm run zip-server-unix",
-    "zip-server-unix": "cd dist && mv index.js index.cjs && zip -r ${npm_package_name}-app-v${npm_package_version}.zip .",
+    "build": "vite build && npm run build-server && node scripts/package.js",
+    "build-server": "esbuild server/index.ts --bundle --platform=node --outfile=dist/index.js",
     "setup": "node setup.js",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -23,6 +19,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "archiver": "^7.0.1",
     "@eslint/js": "^9.9.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

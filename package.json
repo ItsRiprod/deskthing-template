@@ -1,7 +1,7 @@
 {
   "name": "create-deskthing",
   "private": false,
-  "version": "0.10.0",
+  "version": "0.10.1",
   "version_code": 10,
   "type": "module",
   "description": "The DeskThing template for building DeskThing Apps",
@@ -41,7 +41,8 @@
   "author": "Riprod",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^20.0.0",
     "esbuild": "^0.24.0",
-    "@types/node": "^20.0.0"
+    "inquirer": "^12.2.0"
   }
 }
