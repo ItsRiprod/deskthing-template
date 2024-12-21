@@ -30,11 +30,11 @@ async function init(): Promise<void> {
             "What would you like to do? (use arrow keys to navigate, enter to select)",
           choices: [
             {
-              name: "Create new project (Full template)",
+              name: "Create new project (Full template Vite+React+TS+Tailwindcss)",
               value: "full",
             },
             {
-              name: "Create new project (Minimum template)",
+              name: "Create new project (Minimum template Vite+TS)",
               value: "minimum",
             },
             {
@@ -75,6 +75,7 @@ async function init(): Promise<void> {
       case "minimum":
         // Handle minimum template creation
         console.log(chalk.yellow("Creating minimum template..."));
+        result = await startCreation("min");
         break;
     }
     await result;

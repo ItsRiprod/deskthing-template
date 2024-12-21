@@ -56,19 +56,7 @@ export async function updateProject() {
     // Update dev dependencies
     const devDeps = [
       "archiver",
-      "@eslint/js",
-      "@types/react",
-      "@types/react-dom",
       "@vitejs/plugin-legacy",
-      "@vitejs/plugin-react",
-      "autoprefixer",
-      "esbuild",
-      "eslint",
-      "eslint-plugin-react-hooks",
-      "eslint-plugin-react-refresh",
-      "tailwindcss",
-      "typescript",
-      "typescript-eslint",
       "vite",
     ];
 
@@ -82,9 +70,9 @@ export async function updateProject() {
     // Update template files while preserving user modifications
     const templateFiles = [
       "vite.config.ts",
-      "electron.vite.config.ts",
       "tsconfig.json",
       "tsconfig.node.json",
+      "tsconfig.app.json",
       "scripts/package.js",
       "package.json",
     ];
@@ -96,7 +84,7 @@ export async function updateProject() {
         "..",
         "..",
         "template",
-        "full",
+        manifestObject.template || 'full',
         file
       );
       if (fs.existsSync(templatePath)) {

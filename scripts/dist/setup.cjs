@@ -26276,8 +26276,6 @@ async function updateProject() {
     console.log(source_default.blue("Updating deskthing project..."));
     const manifestFile = import_fs.default.readFileSync(manifestPath, "utf-8");
     const manifestObject = JSON.parse(manifestFile);
-    const version = process.env.npm_package_version;
-    const version_code = process.env.npm_package_version_code;
     const updatedManifest = {
       id: manifestObject.id || "deskthingtemplateapp",
       isAudioSource: manifestObject.isAudioSource || false,
@@ -26285,10 +26283,10 @@ async function updateProject() {
       isWebApp: manifestObject.isWebApp || true,
       requires: manifestObject.requires || [],
       label: manifestObject.label || "Template App",
-      version: version || "v0.0.0",
-      version_code: version_code || 0,
-      compatible_server: version_code || 0,
-      compatible_client: version_code || 0,
+      version: manifestObject.version || packageJson.version || "v0.0.0",
+      version_code: manifestObject.version_code || packageJson.version_code || 0,
+      compatible_server: packageJson.version_code || 0,
+      compatible_client: packageJson.version_code || 0,
       description: manifestObject.description || "Description was not found while updating",
       author: manifestObject.author || "Unknown",
       platforms: manifestObject.platforms || ["windows", "mac", "linux"],
@@ -26303,19 +26301,7 @@ async function updateProject() {
     );
     const devDeps = [
       "archiver",
-      "@eslint/js",
-      "@types/react",
-      "@types/react-dom",
       "@vitejs/plugin-legacy",
-      "@vitejs/plugin-react",
-      "autoprefixer",
-      "esbuild",
-      "eslint",
-      "eslint-plugin-react-hooks",
-      "eslint-plugin-react-refresh",
-      "tailwindcss",
-      "typescript",
-      "typescript-eslint",
       "vite"
     ];
     (0, import_child_process2.execSync)(`npm install ${devDeps.join(" ")} --save-dev`, {
@@ -26324,9 +26310,9 @@ async function updateProject() {
     import_fs.default.writeFileSync(manifestPath, JSON.stringify(updatedManifest));
     const templateFiles = [
       "vite.config.ts",
-      "electron.vite.config.ts",
       "tsconfig.json",
       "tsconfig.node.json",
+      "tsconfig.app.json",
       "scripts/package.js",
       "package.json"
     ];
@@ -26337,12 +26323,10 @@ async function updateProject() {
         "..",
         "..",
         "template",
-        "full",
+        manifestObject.template || "full",
         file
       );
-      console.log("Updating ", templatePath);
       if (import_fs.default.existsSync(templatePath)) {
-        console.log("Exists!");
         const templateContent = import_fs.default.readFileSync(templatePath, "utf-8");
         const userFile = import_path3.default.join(process.cwd(), file);
         const dir = import_path3.default.dirname(userFile);
@@ -26404,11 +26388,11 @@ async function init() {
           message: "What would you like to do? (use arrow keys to navigate, enter to select)",
           choices: [
             {
-              name: "Create new project (Full template)",
+              name: "Create new project (Full template Vite+React+TS+Tailwindcss)",
               value: "full"
             },
             {
-              name: "Create new project (Minimum template)",
+              name: "Create new project (Minimum template Vite+TS)",
               value: "minimum"
             },
             {
@@ -26445,6 +26429,7 @@ async function init() {
         break;
       case "minimum":
         console.log(source_default.yellow("Creating minimum template..."));
+        result = await startCreation("min");
         break;
     }
     await result;

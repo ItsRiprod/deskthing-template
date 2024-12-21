@@ -1,8 +1,8 @@
 {
   "name": "create-deskthing",
   "private": false,
-  "version": "0.10.2",
-  "version_code": 10,
+  "version": "0.10.4",
+  "version_code": 10.4,
   "type": "module",
   "description": "The DeskThing template for building DeskThing Apps",
   "main": "scripts/dist/index.js",

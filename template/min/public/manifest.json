@@ -1,20 +1,20 @@
 {
-    "id": "deskthingapp",
-    "isAudioSource": false,
-    "isWebApp": true,
-    "requires": [],
-    "label": "",
-    "version": "v0.9.1",
-    "version_code": 9.1,
-    "compatible_server": [9],
-    "compatible_client": [9],
-    "description": "",
-    "author": "",
-    "platforms": [
-      "windows",
-      "macos",
-      "linux"
-    ],
-    "homepage": "",
-    "repository": ""
-  }
+  "id": "deskthingapp",
+  "isAudioSource": false,
+  "isWebApp": true,
+  "requires": [],
+  "label": "",
+  "version": "v0.10.1",
+  "version_code": 10.1,
+  "compatible_server": [10],
+  "compatible_client": [10],
+  "description": "",
+  "author": "",
+  "platforms": [
+    "windows",
+    "macos",
+    "linux"
+  ],
+  "homepage": "",
+  "repository": ""
+}
