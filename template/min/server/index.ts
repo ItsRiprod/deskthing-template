@@ -1,4 +1,4 @@
-import { DeskThing } from 'deskthing-server'
+import { DeskThing } from '@deskthing/server'
 export { DeskThing }
 
 const startup = async () => {

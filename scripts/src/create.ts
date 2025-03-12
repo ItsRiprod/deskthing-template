@@ -5,22 +5,31 @@ import fs from 'fs-extra';
 import path from 'path';
 import { exec } from 'child_process';
 import ora from 'ora';
-import { ManifestData } from './types';
-import { askQuestion, gatherManifestData, replacePlaceholders, validateProjectName } from './utility';
+import { AppManifest } from '@deskthing/types';
+import { input } from '@inquirer/prompts';
+import { gatherAppManifest, replacePlaceholders, validateProjectName } from './utility';
 
 
 // Initialize the setup process
 export async function startCreation(type: string): Promise<void> {
     try {
       const sourceDir: string = path.join(__dirname, path.join('..', '..', 'template', type)); 
-    const projectName = (await askQuestion('Enter App ID (lowercase, no spaces): ', (input: string) => input.trim().toLowerCase().replaceAll(' ', '-')));
+    const rawProjectName = await input({
+      message: 'Enter App ID: ',
+      validate: (input: string) => input.trim().length > 0 || 'Project name cannot be empty',
+      transformer: (input: string) => { 
+        return input.trim().toLowerCase().replace(/\s+/g, '-')
+      },
+    });
+
+    const projectName = rawProjectName.trim().toLowerCase().replace(/\s+/g, '-');
   
     console.log(`\nCreating project "${projectName}"...`);
 
     const destDir = path.join(process.cwd(), projectName);
     validateProjectName(projectName, destDir);
 
-    const manifestData = await gatherManifestData(projectName, type);
+    const manifestData = await gatherAppManifest(projectName, type);
 
     console.log(`\nCreating project "${projectName}" in "${destDir}"...`);
 
@@ -47,7 +56,7 @@ async function copyTemplate(source: string, destination: string): Promise<void> 
 }
 
 // Helper to create the manifest.json file
-async function createManifest(destDir: string, manifestData: ManifestData): Promise<void> {
+async function createManifest(destDir: string, manifestData: AppManifest): Promise<void> {
   const manifestPath = path.join(destDir, 'public', 'manifest.json');
   await fs.outputJson(manifestPath, manifestData, { spaces: 2 });
   console.log('Manifest file created successfully.\n');

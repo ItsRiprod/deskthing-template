@@ -1,7 +1,7 @@
-import { DeskThing } from "deskthing-server"
+import { DeskThing } from "@deskthing/server"
 
-export const sendSampleData = () => {
-    DeskThing.send({ type: 'sampleData', payload: 'sampleData' })
+export const sendSampleData = (data?: string) => {
+    DeskThing.send({ type: 'sampleData', payload: data || 'sampleData' })
 }
 
 export const sendImage = async () => {

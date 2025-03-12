@@ -7,19 +7,23 @@
  */
 
 /**
- * There are two connectors. DeskThing-server and DeskThing-client
- * To optimize your app, only use DeskThing-server inside the server and DeskThing-client inside the client
+ * There are two connectors. @deskthing/server and DeskThing-client
+ * To optimize your app, only use @deskthing/server inside the server and DeskThing-client inside the client
  *
- * Every app must both import DeskThing-server and export DeskThing-server to allow the DeskThing Server to link with your app
+ * Every app must both import @deskthing/server and export @deskthing/server to allow the DeskThing Server to link with your app
  */
-import { DeskThing, SocketData } from "deskthing-server";
+import { DeskThing } from "@deskthing/server";
+import { ServerEvent, SocketData } from "@deskthing/types";
 // Doing this is required in order for the server to link with DeskThing
 export { DeskThing };
 
 // The following imports are from other files that setup their own functions
-import { setupSettings } from "./settings";
-import { userInput } from "./userInput";
-import { sendImage, sendSampleData } from "./sendingData";
+import { sendImage } from "./sendingData.ts";
+import { setupSettings } from "./settings.ts";
+import { userInput } from "./userInput.ts";
+import { setupWorkers } from "./workerExample.ts";
+import { setupActions } from "./actions.ts";
+import { setupTasks } from "./tasks/tasks.ts";
 
 /**
  * 
@@ -36,12 +40,14 @@ import { sendImage, sendSampleData } from "./sendingData";
  * The following start() function is triggered once the server starts. This is where all initialization should be done.
  */
 const start = async () => {
-  // This is being used to grab any associated data from the server once the app starts. This makes sure we dont try to initialize stuff twice if it already exists
-  const Data = await DeskThing.getData();
+  setupSettings();
+  userInput();
+  setupWorkers()
+  setupActions()
+  setupTasks()
+  DeskThing.sendLog('Server Started again')
 
-  setupSettings(Data);
-  userInput(Data);
-    // This will make Data.settings.theme.value equal whatever the user selects
+  DeskThing.send({ type: 'sampleData', payload: 'Live Reloading!' })
 };
 
 const stop = async () => {
@@ -50,15 +56,17 @@ const stop = async () => {
 };
 
 // Main Entrypoint of the server
-DeskThing.on("start", start);
+DeskThing.on(ServerEvent.START, start);
 
 // Main exit point of the server
-DeskThing.on("stop", stop);
+DeskThing.on(ServerEvent.STOP, stop);
 
 const handleRequest = async (socketData: SocketData) => {
+  DeskThing.sendLog('Got the request')
+  console.log(socketData)
   switch (socketData.request) {
     case 'sampleData':
-      sendSampleData()
+      DeskThing.send({ type: 'sampleData', payload: 'Example Data' })
       break
     case 'image':
       sendImage()
@@ -69,4 +77,4 @@ const handleRequest = async (socketData: SocketData) => {
   }
 }
 
-DeskThing.on('get', handleRequest)
+DeskThing.on(ServerEvent.GET, handleRequest)

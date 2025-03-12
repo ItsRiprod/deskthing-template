@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
 import chalk, { ChalkInstance } from "chalk";
-import fs from "fs-extra";
-import path from "path";
 import readline from "readline";
 import inquirer from "inquirer";
 import { startCreation } from "./create";
@@ -12,13 +10,51 @@ export const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
-export const packageJson = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "../../package.json"), "utf-8")
-);
+
+const args = process.argv.slice(2);
+const isUpdate = args.includes('--update');
+const isCreate = args.includes('--create');
+const isCreateMin = isCreate && args.includes('min');
+const isCreateFull = isCreate && args.includes('full');
+const isHelp = isCreate && args.includes('--help');
 
 // Initialize the setup process
 async function init(): Promise<void> {
   try {
+    if (isHelp) {
+      console.log(chalk.yellow("Help:"));
+      console.log("Usage: deskthing [--update] [--create] [--min] [--full] [--help]");
+      console.log("--update: Upgrade an existing deskthing project.");
+      console.log("--create: Create a new deskthing project.");
+      console.log("--create min: Create a minimal deskthing project.");
+      console.log("--create full: Create a full deskthing project.");
+      console.log("--help: Show this help message.");
+      return;
+    }
+    if (isUpdate) {
+      console.log(chalk.yellow("Upgrading existing project..."));
+      await updateProject();
+      return;
+    }
+
+    if (isCreateMin) {
+      console.log(chalk.yellow("Creating minimum template..."));
+      await startCreation("min");
+      return;
+    }
+
+    if (isCreateFull) {
+      console.log(chalk.yellow("Creating full template..."));
+      await startCreation("full");
+      return;
+    }
+
+    if (isCreate) {
+      console.log(chalk.yellow("Creating base template..."));
+      await startCreation("base");
+      return;
+    }
+
     welcomeMessage(chalk);
 
     const { setupChoice } = await inquirer.prompt(
@@ -30,12 +66,16 @@ async function init(): Promise<void> {
             "What would you like to do? (use arrow keys to navigate, enter to select)",
           choices: [
             {
-              name: "Create new project (Full template Vite+React+TS+Tailwindcss)",
+              name: "Create full project (Template with example code Vite + React + TS + Tailwindcss)",
               value: "full",
             },
             {
-              name: "Create new project (Minimum template Vite+TS)",
-              value: "minimum",
+              name: "Create minimal project (Template with minimal code Vite + React + TS + Tailwindcss)",
+              value: "base",
+            },
+            {
+              name: "Create new project (Minimum template with TS)",
+              value: "min",
             },
             {
               name: "Upgrade existing project",
@@ -72,7 +112,12 @@ async function init(): Promise<void> {
         console.log(chalk.yellow("Creating full template..."));
         result = await startCreation("full");
         break;
-      case "minimum":
+      case "base":
+        // Handle full template creation
+        console.log(chalk.yellow("Creating base template..."));
+        result = await startCreation("base");
+        break;
+      case "min":
         // Handle minimum template creation
         console.log(chalk.yellow("Creating minimum template..."));
         result = await startCreation("min");
@@ -86,9 +131,11 @@ async function init(): Promise<void> {
 }
 
 // Helper to print a welcome message
-function welcomeMessage(chalk: ChalkInstance): void {
+async function welcomeMessage(chalk: ChalkInstance): Promise<void> {
+  const version = (await import("../../package.json")).version;
+  
   console.log(
-    chalk.cyanBright.bold(`Welcome to DeskThing v${packageJson.version}`)
+    chalk.cyanBright.bold(`Welcome to DeskThing v${version}`)
   );
   console.log(
     chalk.cyanBright(

@@ -4,13 +4,7 @@ import { AppSettings, SocketData } from '@deskthing/types'
 
 const App: React.FC = () => {
     const [settings, setSettings] = useState<AppSettings>()
-    const [message, setMessage] = useState<string>()
-    useEffect(() => {
-        const onAppData = async (data: SocketData) => {
-            console.log('Received data from the server!')
-            console.log(data.payload)
-        }
-        
+    useEffect(() => {        
         
         const initializeSettings = async () => {
             const settings = await DeskThing.getSettings()
@@ -25,30 +19,21 @@ const App: React.FC = () => {
             }
         }
 
-        const onClientData = async (data: SocketData) => {
-            console.log('Received data from the client!')
-            setMessage(data.payload)
-        }
-        
         initializeSettings()
         
-        const removeDataListener = DeskThing.on('data', onAppData)
         const removeSettingsListener = DeskThing.on('settings', onAppSettings)
-        const removeClientListener = DeskThing.on('sampleData', onClientData)
 
         return () => {
-            removeDataListener()
             removeSettingsListener()
-            removeClientListener()
         }
     }, [])
 
     return (
-        <div className="bg-slate-800 gap-2 flex-col w-screen h-screen flex justify-center items-center">
+        <div className="bg-black gap-2 flex-col w-screen h-screen flex justify-center items-center">
             <p className="font-bold text-5xl text-white">DeskThing App</p>
             <div className="text-2xl font-semibold">
                 {settings ? (
-                    <div style={{color: settings?.color?.value as string|| 'white'}}>On the client too!: {message|| 'unknown'}</div>
+                    <div style={{color: settings?.color?.value as string|| 'white'}}>Current Selected Color: {settings?.color?.value|| 'unknown'}</div>
                 ) : (
                     <p>Loading Settings</p>
                 )}

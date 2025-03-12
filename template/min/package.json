@@ -11,11 +11,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC",
   "description": "",
   "dependencies": {
-    "deskthing-client": "latest",
-    "deskthing-server": "latest"
+    "@deskthing/client": "latest",
+    "@deskthing/server": "latest"
   },
   "devDependencies": {
     "@vitejs/plugin-legacy": "^6.0.0",
