@@ -1,25 +1,25 @@
 {
   "name": "create-deskthing",
   "private": false,
-  "version": "0.10.7",
-  "type": "module",
+  "version": "0.10.11",
+  "compatible_server": "0.11.0",
+  "compatible_client": "0.11.0",
+  "type": "commonjs",
   "description": "The DeskThing template for building DeskThing Apps",
-  "main": "scripts/dist/index.js",
+  "main": "dist/index.cjs",
   "dependencies": {
-    "chalk": "^5.3.0",
     "ejs": "^3.1.10",
-    "fs-extra": "^11.2.0",
-    "ora": "^8.0.1",
+    "inquirer": "^12.5.0",
     "semver": "^7.6.3"
   },
   "bin": {
-    "deskthing-template": "scripts/dist/setup.cjs"
+    "deskthing-template": "dist/index.cjs"
   },
   "scripts": {
-    "build": "esbuild scripts/src/setup.ts --bundle --platform=node --outfile=scripts/dist/setup.cjs --external:fs-extra --external:path --external:ejs --external:child_process"
+    "build": "esbuild src/index.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs"
   },
   "files": [
-    "scripts/dist/setup.cjs",
+    "dist/index.cjs",
     "README.md",
     "template"
   ],
@@ -41,10 +41,10 @@
   "author": "Riprod",
   "license": "MIT",
   "devDependencies": {
-    "@deskthing/types": "^0.10.7",
+    "@deskthing/types": "^0.10.15",
+    "@types/ejs": "^3.1.5",
     "@types/node": "^20.0.0",
     "@types/semver": "^7.5.8",
-    "esbuild": "^0.24.0",
-    "inquirer": "^12.2.0"
+    "esbuild": "^0.24.0"
   }
 }

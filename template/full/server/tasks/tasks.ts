@@ -1,5 +1,5 @@
 import { DeskThing } from "@deskthing/server";
-import { ServerEvent, STEP_TYPES } from "@deskthing/types";
+import { DESKTHING_EVENTS } from "@deskthing/types";
 import { taskList } from "./taskList";
 
 export const setupTasks = () => {
@@ -9,7 +9,7 @@ export const setupTasks = () => {
 
 };
 
-DeskThing.on(ServerEvent.TASKS, (data) => {
+DeskThing.on(DESKTHING_EVENTS.TASKS, (data) => {
   switch (data.request) {
     case "task":
       // A single task's update

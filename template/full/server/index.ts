@@ -13,9 +13,7 @@
  * Every app must both import @deskthing/server and export @deskthing/server to allow the DeskThing Server to link with your app
  */
 import { DeskThing } from "@deskthing/server";
-import { ServerEvent, SocketData } from "@deskthing/types";
-// Doing this is required in order for the server to link with DeskThing
-export { DeskThing };
+import { DESKTHING_EVENTS, SocketData } from "@deskthing/types";
 
 // The following imports are from other files that setup their own functions
 import { sendImage } from "./sendingData.ts";
@@ -56,10 +54,10 @@ const stop = async () => {
 };
 
 // Main Entrypoint of the server
-DeskThing.on(ServerEvent.START, start);
+DeskThing.on(DESKTHING_EVENTS.START, start);
 
 // Main exit point of the server
-DeskThing.on(ServerEvent.STOP, stop);
+DeskThing.on(DESKTHING_EVENTS.STOP, stop);
 
 const handleRequest = async (socketData: SocketData) => {
   DeskThing.sendLog('Got the request')
@@ -77,4 +75,4 @@ const handleRequest = async (socketData: SocketData) => {
   }
 }
 
-DeskThing.on(ServerEvent.GET, handleRequest)
+DeskThing.on("get", handleRequest)

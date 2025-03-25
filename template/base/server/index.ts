@@ -1,5 +1,5 @@
 import { DeskThing } from "@deskthing/server";
-import { ServerEvent } from "@deskthing/types";
+import { DESKTHING_EVENTS } from "@deskthing/types";
 // Doing this is required in order for the server to link with DeskThing
 export { DeskThing };
 
@@ -24,7 +24,7 @@ const stop = async () => {
 };
 
 // Main Entrypoint of the server
-DeskThing.on(ServerEvent.START, start);
+DeskThing.on(DESKTHING_EVENTS.START, start);
 
 // Main exit point of the server
-DeskThing.on(ServerEvent.STOP, stop);
+DeskThing.on(DESKTHING_EVENTS.STOP, stop);

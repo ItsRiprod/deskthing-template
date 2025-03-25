@@ -8,36 +8,26 @@
     "dev:vite": "vite",
     "dev:wrapper": "npx @deskthing/cli dev",
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:wrapper\"",
-    "build": "deskthing package",
-    "build:server": "esbuild server/index.ts --bundle --platform=node --outfile=dist/server/index.js",
-    "build:workers": "esbuild server/workers/*.ts --bundle --platform=node --outdir=dist/server/workers --format=cjs",
-    "build:package": "deskthing package",
-    "build:packageProd": "npx @deskthing/cli package",
+    "build": "npx @deskthing/cli package",
     "setup": "node setup.js",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "build-server": "esbuild server/index.ts --bundle --platform=node --outfile=dist/index.js",
-    "build-workers": "esbuild server/workers/*.ts --bundle --platform=node --outdir=dist/workers --format=cjs"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@deskthing/client": "^0.10.4",
-    "@deskthing/server": "^0.10.4",
+    "@deskthing/client": "^0.10.9",
+    "@deskthing/server": "^0.10.12",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "ws": "^8.18.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@deskthing/types": "^0.10.7",
+    "@deskthing/cli": "^0.10.20",
+    "@deskthing/types": "^0.10.15",
     "@eslint/js": "^9.9.0",
-    "@types/archiver": "^6.0.3",
     "@types/node": "^22.10.7",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/ws": "^8.5.13",
-    "@vitejs/plugin-legacy": "^5.4.2",
     "@vitejs/plugin-react": "^4.3.1",
-    "archiver": "^7.0.1",
-    "autoprefixer": "^10.4.19",
     "concurrently": "^8.2.2",
     "esbuild": "^0.19.2",
     "eslint": "^9.9.0",
@@ -47,6 +37,6 @@
     "tsm": "^2.3.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.14"
+    "vite": "^5.4.15"
   }
 }

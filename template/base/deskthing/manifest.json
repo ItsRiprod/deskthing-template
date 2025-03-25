@@ -3,7 +3,7 @@
   "isWebApp": true,
   "requires": [],
   "label": "DeskThing Template App",
-  "version": "v0.10.6",
+  "version": "0.11.0",
   "version_code": 10.4,
   "compatible_server": [10],
   "compatible_client": [10],
