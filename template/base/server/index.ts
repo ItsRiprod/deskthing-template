@@ -1,8 +1,5 @@
 import { DeskThing } from "@deskthing/server";
 import { DESKTHING_EVENTS } from "@deskthing/types";
-// Doing this is required in order for the server to link with DeskThing
-export { DeskThing };
-
 
 const start = async () => {
   DeskThing.sendLog('Server Started!')

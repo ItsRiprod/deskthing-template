@@ -14,14 +14,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@deskthing/client": "^0.10.9",
-    "@deskthing/server": "^0.10.12",
+    "@deskthing/client": "latest",
+    "@deskthing/server": "latest",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@deskthing/cli": "^0.10.20",
-    "@deskthing/types": "^0.10.15",
+    "@deskthing/cli": "latest",
+    "@deskthing/types": "latest",
     "@eslint/js": "^9.9.0",
     "@types/node": "^22.10.7",
     "@types/react": "^18.3.3",

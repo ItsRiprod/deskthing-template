@@ -350,7 +350,6 @@ async function updateImports(filePath: string) {
     const regex = new RegExp(replacement.from, "g");
     updatedContent = updatedContent.replace(regex, replacement.to);
   }
-
   await writeFile(filePath, updatedContent, "utf-8");
 }
 
