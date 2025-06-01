@@ -187,6 +187,7 @@ export async function updateProject(options: Options = { noOverwrite: false }) {
 
     if (!options.noOverwrite) {
       // Update template files while preserving user modifications
+      Logger.debug("Updating template files (no-overwrite set to false)...");
       const templateFiles = [
         "vite.config.ts",
         "tsconfig.json",
@@ -344,6 +345,11 @@ async function updateImports(filePath: string) {
     { from: "ToServerData", to: "GenericTransitData" },
     { from: "FromDeviceDataEvents", to: "DEVICE_CLIENT" },
     { from: "ToDeviceDataEvents", to: "CLIENT_REQUESTS" },
+    { from: "DeskThing.sendLog", to: "console.log" },
+    { from: "DeskThing.sendDebug", to: "console.debug" },
+    { from: "DeskThing.sendWarning", to: "console.warn" },
+    { from: "DeskThing.sendWarn", to: "console.warn" },
+    { from: "DeskThing.sendError", to: "console.error" },
   ];
 
   for (const replacement of wordReplacements) {
