@@ -1,7 +1,7 @@
 {
   "name": "create-deskthing",
   "private": false,
-  "version": "0.11.0",
+  "version": "0.11.1",
   "compatible_server": "0.11.0",
   "compatible_client": "0.11.0",
   "type": "commonjs",

@@ -1,13 +1,14 @@
 import { DeskThing } from "@deskthing/server";
-import { DESKTHING_EVENTS } from "@deskthing/types";
+import { AppSettings, DESKTHING_EVENTS, SETTING_TYPES } from "@deskthing/types";
 
 const start = async () => {
-  DeskThing.sendLog('Server Started!')
+  console.log('Server Started!')
 
-  const settings: any = {
+  const settings: AppSettings = {
     color: {
       label: 'App Color',
-      type: 'color',
+      id: 'color',
+      type: SETTING_TYPES.COLOR,
       value: '#000000'
     }
   }
@@ -17,7 +18,7 @@ const start = async () => {
 
 const stop = async () => {
   // Function called when the server is stopped
-  DeskThing.sendLog('Server Stopped');
+  console.log('Server Stopped');
 };
 
 // Main Entrypoint of the server

@@ -15777,6 +15777,7 @@ async function updateProject(options = { noOverwrite: false }) {
     Logger.stopProgress(true);
     await (0, import_promises3.writeFile)(manifestPath, JSON.stringify(updatedManifest));
     if (!options.noOverwrite) {
+      Logger.debug("Updating template files (no-overwrite set to false)...");
       const templateFiles = [
         "vite.config.ts",
         "tsconfig.json",
@@ -15838,7 +15839,9 @@ async function updateProject(options = { noOverwrite: false }) {
       );
       Logger.stopProgress(true);
     } else {
-      Logger.debug(`Not overwriting because noOverwrite is set to ${options.noOverwrite}`);
+      Logger.debug(
+        `Not overwriting because noOverwrite is set to ${options.noOverwrite}`
+      );
     }
     Logger.startProgress("Updating import statements...");
     const tsFiles = await findTypeScriptFiles(process.cwd());
@@ -15905,7 +15908,12 @@ async function updateImports(filePath) {
     { from: "SEND_TYPES", to: "APP_REQUESTS" },
     { from: "ToServerData", to: "GenericTransitData" },
     { from: "FromDeviceDataEvents", to: "DEVICE_CLIENT" },
-    { from: "ToDeviceDataEvents", to: "CLIENT_REQUESTS" }
+    { from: "ToDeviceDataEvents", to: "CLIENT_REQUESTS" },
+    { from: "DeskThing.sendLog", to: "console.log" },
+    { from: "DeskThing.sendDebug", to: "console.debug" },
+    { from: "DeskThing.sendWarning", to: "console.warn" },
+    { from: "DeskThing.sendWarn", to: "console.warn" },
+    { from: "DeskThing.sendError", to: "console.error" }
   ];
   for (const replacement of wordReplacements) {
     const regex = new RegExp(replacement.from, "g");

@@ -1,5 +1,5 @@
 import { DeskThing } from '@deskthing/server';
-import { DESKTHING_EVENTS, SocketData } from '@deskthing/types';
+import { DESKTHING_EVENTS } from '@deskthing/types';
 
 const start = async () => {
   console.log('Started the server')
