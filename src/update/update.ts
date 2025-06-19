@@ -350,6 +350,7 @@ async function updateImports(filePath: string) {
     { from: "DeskThing.sendWarning", to: "console.warn" },
     { from: "DeskThing.sendWarn", to: "console.warn" },
     { from: "DeskThing.sendError", to: "console.error" },
+    { from: "DeskThing.sendDataToClient", to: "DeskThing.send" },
   ];
 
   for (const replacement of wordReplacements) {

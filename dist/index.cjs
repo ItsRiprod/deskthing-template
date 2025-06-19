@@ -15913,7 +15913,8 @@ async function updateImports(filePath) {
     { from: "DeskThing.sendDebug", to: "console.debug" },
     { from: "DeskThing.sendWarning", to: "console.warn" },
     { from: "DeskThing.sendWarn", to: "console.warn" },
-    { from: "DeskThing.sendError", to: "console.error" }
+    { from: "DeskThing.sendError", to: "console.error" },
+    { from: "DeskThing.sendDataToClient", to: "DeskThing.send" }
   ];
   for (const replacement of wordReplacements) {
     const regex = new RegExp(replacement.from, "g");
