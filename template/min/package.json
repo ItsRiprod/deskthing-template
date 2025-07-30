@@ -5,12 +5,11 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev:vite\" \"npm run dev:wrapper\"",
+    "dev": "npx @deskthing/cli dev --vite",
     "build": "npx @deskthing/cli package",
     "build-server": "esbuild server/index.ts --bundle --platform=node --outfile=dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev:vite": "vite",
-    "dev:wrapper": "npx @deskthing/cli dev",
     "setup": "node setup.js",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -22,7 +21,6 @@
   "devDependencies": {
     "@deskthing/cli": "latest",
     "@deskthing/types": "latest",
-    "concurrently": "^9.1.2",
     "tsm": "^2.3.0",
     "vite": "^6.2.3"
   }

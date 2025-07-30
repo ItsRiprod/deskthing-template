@@ -15755,7 +15755,8 @@ async function updateProject(options = { noOverwrite: false }) {
       updateUrl: manifestObject.updateUrl || manifestObject.repository || ""
     };
     Logger.startProgress("Removing old dependencies...");
-    (0, import_child_process2.execSync)("npm uninstall deskthing-client deskthing-server", {
+    (0, import_child_process2.execSync)("npm uninstall deskthing-client deskthing-server concurrently", {
+      // remove concurrently as it is no longer needed
       stdio: "inherit"
     });
     Logger.stopProgress(true);
@@ -15766,7 +15767,6 @@ async function updateProject(options = { noOverwrite: false }) {
     );
     const devDeps = [
       "vite",
-      "concurrently",
       "tsm",
       "@deskthing/types@latest",
       "@deskthing/cli@latest"
@@ -15825,6 +15825,7 @@ async function updateProject(options = { noOverwrite: false }) {
                 ...currentPackage.scripts,
                 ...templatePackage.scripts
               };
+              currentPackage.version = answer || currentPackage.version || manifestObject.version || version;
               await (0, import_promises3.writeFile)(
                 userFile,
                 JSON.stringify(currentPackage, null, 2)

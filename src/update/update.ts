@@ -157,7 +157,7 @@ export async function updateProject(options: Options = { noOverwrite: false }) {
 
     // Remove old deps
     Logger.startProgress("Removing old dependencies...");
-    execSync("npm uninstall deskthing-client deskthing-server", {
+    execSync("npm uninstall deskthing-client deskthing-server concurrently",  { // remove concurrently as it is no longer needed
       stdio: "inherit",
     });
     Logger.stopProgress(true);
@@ -171,7 +171,6 @@ export async function updateProject(options: Options = { noOverwrite: false }) {
     // Update dev dependencies
     const devDeps = [
       "vite",
-      "concurrently",
       "tsm",
       "@deskthing/types@latest",
       "@deskthing/cli@latest",
@@ -246,6 +245,9 @@ export async function updateProject(options: Options = { noOverwrite: false }) {
                 ...currentPackage.scripts,
                 ...templatePackage.scripts,
               };
+
+              // Update the package.json version
+              currentPackage.version = answer || currentPackage.version || manifestObject.version || version;
               await writeFile(
                 userFile,
                 JSON.stringify(currentPackage, null, 2)
