@@ -65,7 +65,7 @@ async function init(): Promise<void> {
       return;
     }
 
-    Logger.header(`Welcome to Create DeskThing v${version}`);
+    Logger.header(`Welcome to the DeskThing Template Engine v${version}`);
     Logger.info("I just need to ask you a few questions and you can be on your way!\n");
     Logger.success("Let's set up your new project!\n");
 

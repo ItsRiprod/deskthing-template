@@ -15410,7 +15410,7 @@ async function replacePlaceholders(destDir, data) {
   console.log("Template placeholders replaced successfully.\n");
 }
 
-// node_modules/@deskthing/types/dist/apps/appData.js
+// ../DeskThing-Types/dist/apps/appData.js
 var PlatformTypes;
 (function(PlatformTypes2) {
   PlatformTypes2["WINDOWS"] = "windows";
@@ -15429,6 +15429,7 @@ var TagTypes;
   TagTypes2["SCREEN_SAVER"] = "screensaver";
   TagTypes2["UTILITY_ONLY"] = "utilityOnly";
   TagTypes2["WEB_APP_ONLY"] = "webappOnly";
+  TagTypes2["AUDIO_AGENT"] = "audioagent";
 })(TagTypes || (TagTypes = {}));
 
 // src/view/appManifest.ts
@@ -15441,9 +15442,9 @@ var import_node_path = require("node:path");
 var import_node_url = require("node:url");
 var import_meta = {};
 var defaultValues = {
-  version: "0.11.0",
-  compatible_client: "0.11.0",
-  compatible_server: "0.11.0"
+  version: "0.11.5",
+  compatible_client: "0.11.2",
+  compatible_server: "0.11.13"
 };
 function getPackagePath() {
   try {
@@ -15988,7 +15989,7 @@ async function init() {
       await startCreation("base");
       return;
     }
-    Logger.header(`Welcome to Create DeskThing v${version}`);
+    Logger.header(`Welcome to the DeskThing Template Engine v${version}`);
     Logger.info("I just need to ask you a few questions and you can be on your way!\n");
     Logger.success("Let's set up your new project!\n");
     const setupChoice = await esm_default11({

@@ -294,8 +294,8 @@ async function updateImports(filePath: string) {
   let updatedContent = content.replace(
     /import\s*{([^}]+)}\s*from\s*['"]deskthing-server['"]/g,
     (match, imports) => {
-      const importList = imports.split(",").map((i) => i.trim());
-      const types = importList.filter((i) => i !== "DeskThing");
+      const importList = imports.split(",").map((i: string) => i.trim());
+      const types = importList.filter((i: string) => i !== "DeskThing");
       const hasDeskthing = importList.includes("DeskThing");
 
       const lines: string[] = [];
@@ -313,8 +313,8 @@ async function updateImports(filePath: string) {
   updatedContent = updatedContent.replace(
     /import\s*{([^}]+)}\s*from\s*['"]deskthing-client['"]/g,
     (match, imports) => {
-      const importList = imports.split(",").map((i) => i.trim());
-      const types = importList.filter((i) => i !== "DeskThing");
+      const importList = imports.split(",").map((i: string) => i.trim());
+      const types = importList.filter((i: string) => i !== "DeskThing");
       const hasDeskthing = importList.includes("DeskThing");
 
       const lines: string[] = [];
