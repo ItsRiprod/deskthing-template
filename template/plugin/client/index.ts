@@ -9,13 +9,13 @@ import { ClientPluginInterface, ClientPluginMountOptions } from "@deskthing/type
  */
 class ClientPlugin implements ClientPluginInterface {
 
-    mount(root: HTMLElement, options?: ClientPluginMountOptions): void | Promise<void> {
+    install(root: HTMLElement, options?: ClientPluginMountOptions): void | Promise<void> {
         console.log("Mounting Client Plugin...", root, options);
 
         // Plugin logic goes here
     }
 
-    unmount(root?: HTMLElement): void | Promise<void> {
+    uninstall(root?: HTMLElement): void | Promise<void> {
         console.log("Unmounting Client Plugin...", root);
 
         // Cleanup logic goes here
