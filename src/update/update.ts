@@ -205,6 +205,7 @@ export async function updateProject(options: Options = { noOverwrite: false }) {
             __dirname,
             "..",
             "template",
+            "app",
             manifestObject.template || "full",
             file
           );

@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const defaultValues = {
   version: "0.11.5",
   compatible_client: "0.11.2",
-  compatible_server: "0.11.13",
+  compatible_server: "0.11.18",
 };
 
 // Function to get package.json path that works in both ESM and CJS

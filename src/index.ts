@@ -6,6 +6,7 @@ import { updateProject } from "./update/update";
 import { select, confirm } from "@inquirer/prompts";
 import { Logger } from "./view/logger";
 import { version } from "./config/config"
+import createPlugin from "./create/createPlugin";
 
 export const rl = readline.createInterface({
   input: process.stdin,
@@ -14,7 +15,8 @@ export const rl = readline.createInterface({
 
 const args = process.argv.slice(2);
 const isUpdate = args.includes("--update");
-const isCreate = args.includes("--create");
+const isCreate = args.includes("--create") || !args.includes("--plugin");
+const isCreatePlugin = args.includes("--plugin");
 const isCreateMin = isCreate && args.includes("min");
 const isCreateFull = isCreate && args.includes("full");
 const isHelp = isCreate && args.includes("--help");
@@ -62,6 +64,12 @@ async function init(): Promise<void> {
     if (isCreate) {
       Logger.info("Creating base template...");
       await startCreation("base");
+      return;
+    }
+
+    if (isCreatePlugin) {
+      Logger.info("Creating plugin template...");
+      await createPlugin()
       return;
     }
 

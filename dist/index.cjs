@@ -1120,15 +1120,15 @@ var require_route = __commonJS({
       };
     }
     function wrapConversion(toModel, graph) {
-      const path4 = [graph[toModel].parent, toModel];
+      const path6 = [graph[toModel].parent, toModel];
       let fn = conversions[graph[toModel].parent][toModel];
       let cur = graph[toModel].parent;
       while (graph[cur].parent) {
-        path4.unshift(graph[cur].parent);
+        path6.unshift(graph[cur].parent);
         fn = link(conversions[graph[cur].parent][cur], fn);
         cur = graph[cur].parent;
       }
-      fn.conversion = path4;
+      fn.conversion = path6;
       return fn;
     }
     module2.exports = function(fromModel) {
@@ -7058,7 +7058,7 @@ var require_iso2022 = __commonJS({
 // node_modules/chardet/index.js
 var require_chardet = __commonJS({
   "node_modules/chardet/index.js"(exports2, module2) {
-    var fs = require("fs");
+    var fs3 = require("fs");
     var utf8 = require_utf8();
     var unicode = require_unicode();
     var mbcs = require_mbcs();
@@ -7132,28 +7132,28 @@ var require_chardet = __commonJS({
       var fd;
       var handler = function(err, buffer) {
         if (fd) {
-          fs.closeSync(fd);
+          fs3.closeSync(fd);
         }
         if (err) return cb(err, null);
         cb(null, self.detect(buffer, opts));
       };
       if (opts && opts.sampleSize) {
-        fd = fs.openSync(filepath, "r"), sample = Buffer.allocUnsafe(opts.sampleSize);
-        fs.read(fd, sample, 0, opts.sampleSize, null, function(err) {
+        fd = fs3.openSync(filepath, "r"), sample = Buffer.allocUnsafe(opts.sampleSize);
+        fs3.read(fd, sample, 0, opts.sampleSize, null, function(err) {
           handler(err, sample);
         });
         return;
       }
-      fs.readFile(filepath, handler);
+      fs3.readFile(filepath, handler);
     };
     module2.exports.detectFileSync = function(filepath, opts) {
       if (opts && opts.sampleSize) {
-        var fd = fs.openSync(filepath, "r"), sample2 = Buffer.allocUnsafe(opts.sampleSize);
-        fs.readSync(fd, sample2, 0, opts.sampleSize);
-        fs.closeSync(fd);
+        var fd = fs3.openSync(filepath, "r"), sample2 = Buffer.allocUnsafe(opts.sampleSize);
+        fs3.readSync(fd, sample2, 0, opts.sampleSize);
+        fs3.closeSync(fd);
         return self.detect(sample2, opts);
       }
-      return self.detect(fs.readFileSync(filepath), opts);
+      return self.detect(fs3.readFileSync(filepath), opts);
     };
     module2.exports.detectAll = function(buffer, opts) {
       if (typeof opts !== "object") {
@@ -10618,16 +10618,16 @@ var require_os_tmpdir = __commonJS({
     var isWindows = process.platform === "win32";
     var trailingSlashRe = isWindows ? /[^:]\\$/ : /.\/$/;
     module2.exports = function() {
-      var path4;
+      var path6;
       if (isWindows) {
-        path4 = process.env.TEMP || process.env.TMP || (process.env.SystemRoot || process.env.windir) + "\\temp";
+        path6 = process.env.TEMP || process.env.TMP || (process.env.SystemRoot || process.env.windir) + "\\temp";
       } else {
-        path4 = process.env.TMPDIR || process.env.TMP || process.env.TEMP || "/tmp";
+        path6 = process.env.TMPDIR || process.env.TMP || process.env.TEMP || "/tmp";
       }
-      if (trailingSlashRe.test(path4)) {
-        path4 = path4.slice(0, -1);
+      if (trailingSlashRe.test(path6)) {
+        path6 = path6.slice(0, -1);
       }
-      return path4;
+      return path6;
     };
   }
 });
@@ -10635,8 +10635,8 @@ var require_os_tmpdir = __commonJS({
 // node_modules/tmp/lib/tmp.js
 var require_tmp = __commonJS({
   "node_modules/tmp/lib/tmp.js"(exports2, module2) {
-    var fs = require("fs");
-    var path4 = require("path");
+    var fs3 = require("fs");
+    var path6 = require("path");
     var crypto = require("crypto");
     var osTmpDir = require_os_tmpdir();
     var _c = process.binding("constants");
@@ -10678,7 +10678,7 @@ var require_tmp = __commonJS({
     }
     function _generateTmpName(opts) {
       if (opts.name) {
-        return path4.join(opts.dir || tmpDir, opts.name);
+        return path6.join(opts.dir || tmpDir, opts.name);
       }
       if (opts.template) {
         return opts.template.replace(TEMPLATE_PATTERN, _randomChars(6));
@@ -10689,7 +10689,7 @@ var require_tmp = __commonJS({
         _randomChars(12),
         opts.postfix || ""
       ].join("");
-      return path4.join(opts.dir || tmpDir, name);
+      return path6.join(opts.dir || tmpDir, name);
     }
     function tmpName(options, callback) {
       var args2 = _parseArguments(options, callback), opts = args2[0], cb = args2[1], tries = opts.name ? 1 : opts.tries || DEFAULT_TRIES;
@@ -10699,7 +10699,7 @@ var require_tmp = __commonJS({
         return cb(new Error("Invalid template provided"));
       (function _getUniqueName() {
         const name = _generateTmpName(opts);
-        fs.stat(name, function(err) {
+        fs3.stat(name, function(err) {
           if (!err) {
             if (tries-- > 0) return _getUniqueName();
             return cb(new Error("Could not get a unique tmp filename, max tries reached " + name));
@@ -10717,7 +10717,7 @@ var require_tmp = __commonJS({
       do {
         const name = _generateTmpName(opts);
         try {
-          fs.statSync(name);
+          fs3.statSync(name);
         } catch (e) {
           return name;
         }
@@ -10729,13 +10729,13 @@ var require_tmp = __commonJS({
       opts.postfix = _isUndefined(opts.postfix) ? ".tmp" : opts.postfix;
       tmpName(opts, function _tmpNameCreated(err, name) {
         if (err) return cb(err);
-        fs.open(name, CREATE_FLAGS, opts.mode || FILE_MODE, function _fileCreated(err2, fd) {
+        fs3.open(name, CREATE_FLAGS, opts.mode || FILE_MODE, function _fileCreated(err2, fd) {
           if (err2) return cb(err2);
           if (opts.discardDescriptor) {
-            return fs.close(fd, function _discardCallback(err3) {
+            return fs3.close(fd, function _discardCallback(err3) {
               if (err3) {
                 try {
-                  fs.unlinkSync(name);
+                  fs3.unlinkSync(name);
                 } catch (e) {
                   if (!isENOENT(e)) {
                     err3 = e;
@@ -10758,9 +10758,9 @@ var require_tmp = __commonJS({
       opts.postfix = opts.postfix || ".tmp";
       const discardOrDetachDescriptor = opts.discardDescriptor || opts.detachDescriptor;
       const name = tmpNameSync(opts);
-      var fd = fs.openSync(name, CREATE_FLAGS, opts.mode || FILE_MODE);
+      var fd = fs3.openSync(name, CREATE_FLAGS, opts.mode || FILE_MODE);
       if (opts.discardDescriptor) {
-        fs.closeSync(fd);
+        fs3.closeSync(fd);
         fd = void 0;
       }
       return {
@@ -10772,9 +10772,9 @@ var require_tmp = __commonJS({
     function _rmdirRecursiveSync(root) {
       const dirs = [root];
       do {
-        var dir2 = dirs.pop(), deferred = false, files = fs.readdirSync(dir2);
+        var dir2 = dirs.pop(), deferred = false, files = fs3.readdirSync(dir2);
         for (var i = 0, length = files.length; i < length; i++) {
-          var file2 = path4.join(dir2, files[i]), stat3 = fs.lstatSync(file2);
+          var file2 = path6.join(dir2, files[i]), stat3 = fs3.lstatSync(file2);
           if (stat3.isDirectory()) {
             if (!deferred) {
               deferred = true;
@@ -10782,11 +10782,11 @@ var require_tmp = __commonJS({
             }
             dirs.push(file2);
           } else {
-            fs.unlinkSync(file2);
+            fs3.unlinkSync(file2);
           }
         }
         if (!deferred) {
-          fs.rmdirSync(dir2);
+          fs3.rmdirSync(dir2);
         }
       } while (dirs.length !== 0);
     }
@@ -10794,7 +10794,7 @@ var require_tmp = __commonJS({
       var args2 = _parseArguments(options, callback), opts = args2[0], cb = args2[1];
       tmpName(opts, function _tmpNameCreated(err, name) {
         if (err) return cb(err);
-        fs.mkdir(name, opts.mode || DIR_MODE, function _dirCreated(err2) {
+        fs3.mkdir(name, opts.mode || DIR_MODE, function _dirCreated(err2) {
           if (err2) return cb(err2);
           cb(null, name, _prepareTmpDirRemoveCallback(name, opts));
         });
@@ -10803,7 +10803,7 @@ var require_tmp = __commonJS({
     function dirSync(options) {
       var args2 = _parseArguments(options), opts = args2[0];
       const name = tmpNameSync(opts);
-      fs.mkdirSync(name, opts.mode || DIR_MODE);
+      fs3.mkdirSync(name, opts.mode || DIR_MODE);
       return {
         name,
         removeCallback: _prepareTmpDirRemoveCallback(name, opts)
@@ -10813,7 +10813,7 @@ var require_tmp = __commonJS({
       const removeCallback = _prepareRemoveCallback(function _removeCallback(fdPath) {
         try {
           if (0 <= fdPath[0]) {
-            fs.closeSync(fdPath[0]);
+            fs3.closeSync(fdPath[0]);
           }
         } catch (e) {
           if (!isEBADF(e) && !isENOENT(e)) {
@@ -10821,7 +10821,7 @@ var require_tmp = __commonJS({
           }
         }
         try {
-          fs.unlinkSync(fdPath[1]);
+          fs3.unlinkSync(fdPath[1]);
         } catch (e) {
           if (!isENOENT(e)) {
             throw e;
@@ -10834,7 +10834,7 @@ var require_tmp = __commonJS({
       return removeCallback;
     }
     function _prepareTmpDirRemoveCallback(name, opts) {
-      const removeFunction = opts.unsafeCleanup ? _rmdirRecursiveSync : fs.rmdirSync.bind(fs);
+      const removeFunction = opts.unsafeCleanup ? _rmdirRecursiveSync : fs3.rmdirSync.bind(fs3);
       const removeCallback = _prepareRemoveCallback(removeFunction, name);
       if (!opts.keep) {
         _removeObjects.unshift(removeCallback);
@@ -11458,8 +11458,8 @@ var require_package = __commonJS({
 var require_ejs = __commonJS({
   "node_modules/ejs/lib/ejs.js"(exports2) {
     "use strict";
-    var fs = require("fs");
-    var path4 = require("path");
+    var fs3 = require("fs");
+    var path6 = require("path");
     var utils = require_utils();
     var scopeOptionWarned = false;
     var _VERSION_STRING = require_package().version;
@@ -11486,13 +11486,13 @@ var require_ejs = __commonJS({
     var _BOM = /^\uFEFF/;
     var _JS_IDENTIFIER = /^[a-zA-Z_$][0-9a-zA-Z_$]*$/;
     exports2.cache = utils.cache;
-    exports2.fileLoader = fs.readFileSync;
+    exports2.fileLoader = fs3.readFileSync;
     exports2.localsName = _DEFAULT_LOCALS_NAME;
     exports2.promiseImpl = new Function("return this;")().Promise;
     exports2.resolveInclude = function(name, filename, isDir) {
-      var dirname2 = path4.dirname;
-      var extname = path4.extname;
-      var resolve = path4.resolve;
+      var dirname2 = path6.dirname;
+      var extname = path6.extname;
+      var resolve = path6.resolve;
       var includePath = resolve(isDir ? filename : dirname2(filename), name);
       var ext = extname(name);
       if (!ext) {
@@ -11504,35 +11504,35 @@ var require_ejs = __commonJS({
       var filePath;
       if (paths.some(function(v) {
         filePath = exports2.resolveInclude(name, v, true);
-        return fs.existsSync(filePath);
+        return fs3.existsSync(filePath);
       })) {
         return filePath;
       }
     }
-    function getIncludePath(path5, options) {
+    function getIncludePath(path7, options) {
       var includePath;
       var filePath;
       var views = options.views;
-      var match = /^[A-Za-z]+:\\|^\//.exec(path5);
+      var match = /^[A-Za-z]+:\\|^\//.exec(path7);
       if (match && match.length) {
-        path5 = path5.replace(/^\/*/, "");
+        path7 = path7.replace(/^\/*/, "");
         if (Array.isArray(options.root)) {
-          includePath = resolvePaths(path5, options.root);
+          includePath = resolvePaths(path7, options.root);
         } else {
-          includePath = exports2.resolveInclude(path5, options.root || "/", true);
+          includePath = exports2.resolveInclude(path7, options.root || "/", true);
         }
       } else {
         if (options.filename) {
-          filePath = exports2.resolveInclude(path5, options.filename);
-          if (fs.existsSync(filePath)) {
+          filePath = exports2.resolveInclude(path7, options.filename);
+          if (fs3.existsSync(filePath)) {
             includePath = filePath;
           }
         }
         if (!includePath && Array.isArray(views)) {
-          includePath = resolvePaths(path5, views);
+          includePath = resolvePaths(path7, views);
         }
         if (!includePath && typeof options.includer !== "function") {
-          throw new Error('Could not find the include file "' + options.escapeFunction(path5) + '"');
+          throw new Error('Could not find the include file "' + options.escapeFunction(path7) + '"');
         }
       }
       return includePath;
@@ -11591,11 +11591,11 @@ var require_ejs = __commonJS({
     function fileLoader(filePath) {
       return exports2.fileLoader(filePath);
     }
-    function includeFile(path5, options) {
+    function includeFile(path7, options) {
       var opts = utils.shallowCopy(utils.createNullProtoObjWherePossible(), options);
-      opts.filename = getIncludePath(path5, opts);
+      opts.filename = getIncludePath(path7, opts);
       if (typeof options.includer === "function") {
-        var includerResult = options.includer(path5, opts.filename);
+        var includerResult = options.includer(path7, opts.filename);
         if (includerResult) {
           if (includerResult.filename) {
             opts.filename = includerResult.filename;
@@ -11830,12 +11830,12 @@ var require_ejs = __commonJS({
           throw e;
         }
         var returnedFn = opts.client ? fn : function anonymous(data) {
-          var include = function(path5, includeData) {
+          var include = function(path7, includeData) {
             var d = utils.shallowCopy(utils.createNullProtoObjWherePossible(), data);
             if (includeData) {
               d = utils.shallowCopy(d, includeData);
             }
-            return includeFile(path5, opts)(d);
+            return includeFile(path7, opts)(d);
           };
           return fn.apply(
             opts.context,
@@ -11844,7 +11844,7 @@ var require_ejs = __commonJS({
         };
         if (opts.filename && typeof Object.defineProperty === "function") {
           var filename = opts.filename;
-          var basename = path4.basename(filename, path4.extname(filename));
+          var basename = path6.basename(filename, path6.extname(filename));
           try {
             Object.defineProperty(returnedFn, "name", {
               value: basename,
@@ -12533,8 +12533,8 @@ var require_gte = __commonJS({
 var require_lt = __commonJS({
   "node_modules/semver/functions/lt.js"(exports2, module2) {
     var compare = require_compare();
-    var lt = (a, b, loose) => compare(a, b, loose) < 0;
-    module2.exports = lt;
+    var lt2 = (a, b, loose) => compare(a, b, loose) < 0;
+    module2.exports = lt2;
   }
 });
 
@@ -12554,7 +12554,7 @@ var require_cmp = __commonJS({
     var neq = require_neq();
     var gt = require_gt();
     var gte = require_gte();
-    var lt = require_lt();
+    var lt2 = require_lt();
     var lte = require_lte();
     var cmp = (a, op, b, loose) => {
       switch (op) {
@@ -12585,7 +12585,7 @@ var require_cmp = __commonJS({
         case ">=":
           return gte(a, b, loose);
         case "<":
-          return lt(a, b, loose);
+          return lt2(a, b, loose);
         case "<=":
           return lte(a, b, loose);
         default:
@@ -13095,6 +13095,760 @@ var require_valid2 = __commonJS({
       }
     };
     module2.exports = validRange;
+  }
+});
+
+// node_modules/semver/functions/clean.js
+var require_clean = __commonJS({
+  "node_modules/semver/functions/clean.js"(exports2, module2) {
+    var parse = require_parse();
+    var clean = (version2, options) => {
+      const s = parse(version2.trim().replace(/^[=v]+/, ""), options);
+      return s ? s.version : null;
+    };
+    module2.exports = clean;
+  }
+});
+
+// node_modules/semver/functions/inc.js
+var require_inc = __commonJS({
+  "node_modules/semver/functions/inc.js"(exports2, module2) {
+    var SemVer = require_semver();
+    var inc = (version2, release, options, identifier, identifierBase) => {
+      if (typeof options === "string") {
+        identifierBase = identifier;
+        identifier = options;
+        options = void 0;
+      }
+      try {
+        return new SemVer(
+          version2 instanceof SemVer ? version2.version : version2,
+          options
+        ).inc(release, identifier, identifierBase).version;
+      } catch (er) {
+        return null;
+      }
+    };
+    module2.exports = inc;
+  }
+});
+
+// node_modules/semver/functions/diff.js
+var require_diff = __commonJS({
+  "node_modules/semver/functions/diff.js"(exports2, module2) {
+    var parse = require_parse();
+    var diff = (version1, version2) => {
+      const v1 = parse(version1, null, true);
+      const v2 = parse(version2, null, true);
+      const comparison = v1.compare(v2);
+      if (comparison === 0) {
+        return null;
+      }
+      const v1Higher = comparison > 0;
+      const highVersion = v1Higher ? v1 : v2;
+      const lowVersion = v1Higher ? v2 : v1;
+      const highHasPre = !!highVersion.prerelease.length;
+      const lowHasPre = !!lowVersion.prerelease.length;
+      if (lowHasPre && !highHasPre) {
+        if (!lowVersion.patch && !lowVersion.minor) {
+          return "major";
+        }
+        if (highVersion.patch) {
+          return "patch";
+        }
+        if (highVersion.minor) {
+          return "minor";
+        }
+        return "major";
+      }
+      const prefix = highHasPre ? "pre" : "";
+      if (v1.major !== v2.major) {
+        return prefix + "major";
+      }
+      if (v1.minor !== v2.minor) {
+        return prefix + "minor";
+      }
+      if (v1.patch !== v2.patch) {
+        return prefix + "patch";
+      }
+      return "prerelease";
+    };
+    module2.exports = diff;
+  }
+});
+
+// node_modules/semver/functions/major.js
+var require_major = __commonJS({
+  "node_modules/semver/functions/major.js"(exports2, module2) {
+    var SemVer = require_semver();
+    var major = (a, loose) => new SemVer(a, loose).major;
+    module2.exports = major;
+  }
+});
+
+// node_modules/semver/functions/minor.js
+var require_minor = __commonJS({
+  "node_modules/semver/functions/minor.js"(exports2, module2) {
+    var SemVer = require_semver();
+    var minor = (a, loose) => new SemVer(a, loose).minor;
+    module2.exports = minor;
+  }
+});
+
+// node_modules/semver/functions/patch.js
+var require_patch = __commonJS({
+  "node_modules/semver/functions/patch.js"(exports2, module2) {
+    var SemVer = require_semver();
+    var patch = (a, loose) => new SemVer(a, loose).patch;
+    module2.exports = patch;
+  }
+});
+
+// node_modules/semver/functions/prerelease.js
+var require_prerelease = __commonJS({
+  "node_modules/semver/functions/prerelease.js"(exports2, module2) {
+    var parse = require_parse();
+    var prerelease = (version2, options) => {
+      const parsed = parse(version2, options);
+      return parsed && parsed.prerelease.length ? parsed.prerelease : null;
+    };
+    module2.exports = prerelease;
+  }
+});
+
+// node_modules/semver/functions/rcompare.js
+var require_rcompare = __commonJS({
+  "node_modules/semver/functions/rcompare.js"(exports2, module2) {
+    var compare = require_compare();
+    var rcompare = (a, b, loose) => compare(b, a, loose);
+    module2.exports = rcompare;
+  }
+});
+
+// node_modules/semver/functions/compare-loose.js
+var require_compare_loose = __commonJS({
+  "node_modules/semver/functions/compare-loose.js"(exports2, module2) {
+    var compare = require_compare();
+    var compareLoose = (a, b) => compare(a, b, true);
+    module2.exports = compareLoose;
+  }
+});
+
+// node_modules/semver/functions/compare-build.js
+var require_compare_build = __commonJS({
+  "node_modules/semver/functions/compare-build.js"(exports2, module2) {
+    var SemVer = require_semver();
+    var compareBuild = (a, b, loose) => {
+      const versionA = new SemVer(a, loose);
+      const versionB = new SemVer(b, loose);
+      return versionA.compare(versionB) || versionA.compareBuild(versionB);
+    };
+    module2.exports = compareBuild;
+  }
+});
+
+// node_modules/semver/functions/sort.js
+var require_sort = __commonJS({
+  "node_modules/semver/functions/sort.js"(exports2, module2) {
+    var compareBuild = require_compare_build();
+    var sort = (list, loose) => list.sort((a, b) => compareBuild(a, b, loose));
+    module2.exports = sort;
+  }
+});
+
+// node_modules/semver/functions/rsort.js
+var require_rsort = __commonJS({
+  "node_modules/semver/functions/rsort.js"(exports2, module2) {
+    var compareBuild = require_compare_build();
+    var rsort = (list, loose) => list.sort((a, b) => compareBuild(b, a, loose));
+    module2.exports = rsort;
+  }
+});
+
+// node_modules/semver/functions/coerce.js
+var require_coerce = __commonJS({
+  "node_modules/semver/functions/coerce.js"(exports2, module2) {
+    var SemVer = require_semver();
+    var parse = require_parse();
+    var { safeRe: re, t } = require_re();
+    var coerce2 = (version2, options) => {
+      if (version2 instanceof SemVer) {
+        return version2;
+      }
+      if (typeof version2 === "number") {
+        version2 = String(version2);
+      }
+      if (typeof version2 !== "string") {
+        return null;
+      }
+      options = options || {};
+      let match = null;
+      if (!options.rtl) {
+        match = version2.match(options.includePrerelease ? re[t.COERCEFULL] : re[t.COERCE]);
+      } else {
+        const coerceRtlRegex = options.includePrerelease ? re[t.COERCERTLFULL] : re[t.COERCERTL];
+        let next;
+        while ((next = coerceRtlRegex.exec(version2)) && (!match || match.index + match[0].length !== version2.length)) {
+          if (!match || next.index + next[0].length !== match.index + match[0].length) {
+            match = next;
+          }
+          coerceRtlRegex.lastIndex = next.index + next[1].length + next[2].length;
+        }
+        coerceRtlRegex.lastIndex = -1;
+      }
+      if (match === null) {
+        return null;
+      }
+      const major = match[2];
+      const minor = match[3] || "0";
+      const patch = match[4] || "0";
+      const prerelease = options.includePrerelease && match[5] ? `-${match[5]}` : "";
+      const build = options.includePrerelease && match[6] ? `+${match[6]}` : "";
+      return parse(`${major}.${minor}.${patch}${prerelease}${build}`, options);
+    };
+    module2.exports = coerce2;
+  }
+});
+
+// node_modules/semver/functions/satisfies.js
+var require_satisfies = __commonJS({
+  "node_modules/semver/functions/satisfies.js"(exports2, module2) {
+    var Range = require_range();
+    var satisfies = (version2, range, options) => {
+      try {
+        range = new Range(range, options);
+      } catch (er) {
+        return false;
+      }
+      return range.test(version2);
+    };
+    module2.exports = satisfies;
+  }
+});
+
+// node_modules/semver/ranges/to-comparators.js
+var require_to_comparators = __commonJS({
+  "node_modules/semver/ranges/to-comparators.js"(exports2, module2) {
+    var Range = require_range();
+    var toComparators = (range, options) => new Range(range, options).set.map((comp) => comp.map((c) => c.value).join(" ").trim().split(" "));
+    module2.exports = toComparators;
+  }
+});
+
+// node_modules/semver/ranges/max-satisfying.js
+var require_max_satisfying = __commonJS({
+  "node_modules/semver/ranges/max-satisfying.js"(exports2, module2) {
+    var SemVer = require_semver();
+    var Range = require_range();
+    var maxSatisfying = (versions, range, options) => {
+      let max = null;
+      let maxSV = null;
+      let rangeObj = null;
+      try {
+        rangeObj = new Range(range, options);
+      } catch (er) {
+        return null;
+      }
+      versions.forEach((v) => {
+        if (rangeObj.test(v)) {
+          if (!max || maxSV.compare(v) === -1) {
+            max = v;
+            maxSV = new SemVer(max, options);
+          }
+        }
+      });
+      return max;
+    };
+    module2.exports = maxSatisfying;
+  }
+});
+
+// node_modules/semver/ranges/min-satisfying.js
+var require_min_satisfying = __commonJS({
+  "node_modules/semver/ranges/min-satisfying.js"(exports2, module2) {
+    var SemVer = require_semver();
+    var Range = require_range();
+    var minSatisfying = (versions, range, options) => {
+      let min = null;
+      let minSV = null;
+      let rangeObj = null;
+      try {
+        rangeObj = new Range(range, options);
+      } catch (er) {
+        return null;
+      }
+      versions.forEach((v) => {
+        if (rangeObj.test(v)) {
+          if (!min || minSV.compare(v) === 1) {
+            min = v;
+            minSV = new SemVer(min, options);
+          }
+        }
+      });
+      return min;
+    };
+    module2.exports = minSatisfying;
+  }
+});
+
+// node_modules/semver/ranges/min-version.js
+var require_min_version = __commonJS({
+  "node_modules/semver/ranges/min-version.js"(exports2, module2) {
+    var SemVer = require_semver();
+    var Range = require_range();
+    var gt = require_gt();
+    var minVersion2 = (range, loose) => {
+      range = new Range(range, loose);
+      let minver = new SemVer("0.0.0");
+      if (range.test(minver)) {
+        return minver;
+      }
+      minver = new SemVer("0.0.0-0");
+      if (range.test(minver)) {
+        return minver;
+      }
+      minver = null;
+      for (let i = 0; i < range.set.length; ++i) {
+        const comparators = range.set[i];
+        let setMin = null;
+        comparators.forEach((comparator) => {
+          const compver = new SemVer(comparator.semver.version);
+          switch (comparator.operator) {
+            case ">":
+              if (compver.prerelease.length === 0) {
+                compver.patch++;
+              } else {
+                compver.prerelease.push(0);
+              }
+              compver.raw = compver.format();
+            /* fallthrough */
+            case "":
+            case ">=":
+              if (!setMin || gt(compver, setMin)) {
+                setMin = compver;
+              }
+              break;
+            case "<":
+            case "<=":
+              break;
+            /* istanbul ignore next */
+            default:
+              throw new Error(`Unexpected operation: ${comparator.operator}`);
+          }
+        });
+        if (setMin && (!minver || gt(minver, setMin))) {
+          minver = setMin;
+        }
+      }
+      if (minver && range.test(minver)) {
+        return minver;
+      }
+      return null;
+    };
+    module2.exports = minVersion2;
+  }
+});
+
+// node_modules/semver/ranges/outside.js
+var require_outside = __commonJS({
+  "node_modules/semver/ranges/outside.js"(exports2, module2) {
+    var SemVer = require_semver();
+    var Comparator = require_comparator();
+    var { ANY } = Comparator;
+    var Range = require_range();
+    var satisfies = require_satisfies();
+    var gt = require_gt();
+    var lt2 = require_lt();
+    var lte = require_lte();
+    var gte = require_gte();
+    var outside = (version2, range, hilo, options) => {
+      version2 = new SemVer(version2, options);
+      range = new Range(range, options);
+      let gtfn, ltefn, ltfn, comp, ecomp;
+      switch (hilo) {
+        case ">":
+          gtfn = gt;
+          ltefn = lte;
+          ltfn = lt2;
+          comp = ">";
+          ecomp = ">=";
+          break;
+        case "<":
+          gtfn = lt2;
+          ltefn = gte;
+          ltfn = gt;
+          comp = "<";
+          ecomp = "<=";
+          break;
+        default:
+          throw new TypeError('Must provide a hilo val of "<" or ">"');
+      }
+      if (satisfies(version2, range, options)) {
+        return false;
+      }
+      for (let i = 0; i < range.set.length; ++i) {
+        const comparators = range.set[i];
+        let high = null;
+        let low = null;
+        comparators.forEach((comparator) => {
+          if (comparator.semver === ANY) {
+            comparator = new Comparator(">=0.0.0");
+          }
+          high = high || comparator;
+          low = low || comparator;
+          if (gtfn(comparator.semver, high.semver, options)) {
+            high = comparator;
+          } else if (ltfn(comparator.semver, low.semver, options)) {
+            low = comparator;
+          }
+        });
+        if (high.operator === comp || high.operator === ecomp) {
+          return false;
+        }
+        if ((!low.operator || low.operator === comp) && ltefn(version2, low.semver)) {
+          return false;
+        } else if (low.operator === ecomp && ltfn(version2, low.semver)) {
+          return false;
+        }
+      }
+      return true;
+    };
+    module2.exports = outside;
+  }
+});
+
+// node_modules/semver/ranges/gtr.js
+var require_gtr = __commonJS({
+  "node_modules/semver/ranges/gtr.js"(exports2, module2) {
+    var outside = require_outside();
+    var gtr = (version2, range, options) => outside(version2, range, ">", options);
+    module2.exports = gtr;
+  }
+});
+
+// node_modules/semver/ranges/ltr.js
+var require_ltr = __commonJS({
+  "node_modules/semver/ranges/ltr.js"(exports2, module2) {
+    var outside = require_outside();
+    var ltr = (version2, range, options) => outside(version2, range, "<", options);
+    module2.exports = ltr;
+  }
+});
+
+// node_modules/semver/ranges/intersects.js
+var require_intersects = __commonJS({
+  "node_modules/semver/ranges/intersects.js"(exports2, module2) {
+    var Range = require_range();
+    var intersects = (r1, r2, options) => {
+      r1 = new Range(r1, options);
+      r2 = new Range(r2, options);
+      return r1.intersects(r2, options);
+    };
+    module2.exports = intersects;
+  }
+});
+
+// node_modules/semver/ranges/simplify.js
+var require_simplify = __commonJS({
+  "node_modules/semver/ranges/simplify.js"(exports2, module2) {
+    var satisfies = require_satisfies();
+    var compare = require_compare();
+    module2.exports = (versions, range, options) => {
+      const set = [];
+      let first = null;
+      let prev = null;
+      const v = versions.sort((a, b) => compare(a, b, options));
+      for (const version2 of v) {
+        const included = satisfies(version2, range, options);
+        if (included) {
+          prev = version2;
+          if (!first) {
+            first = version2;
+          }
+        } else {
+          if (prev) {
+            set.push([first, prev]);
+          }
+          prev = null;
+          first = null;
+        }
+      }
+      if (first) {
+        set.push([first, null]);
+      }
+      const ranges = [];
+      for (const [min, max] of set) {
+        if (min === max) {
+          ranges.push(min);
+        } else if (!max && min === v[0]) {
+          ranges.push("*");
+        } else if (!max) {
+          ranges.push(`>=${min}`);
+        } else if (min === v[0]) {
+          ranges.push(`<=${max}`);
+        } else {
+          ranges.push(`${min} - ${max}`);
+        }
+      }
+      const simplified = ranges.join(" || ");
+      const original = typeof range.raw === "string" ? range.raw : String(range);
+      return simplified.length < original.length ? simplified : range;
+    };
+  }
+});
+
+// node_modules/semver/ranges/subset.js
+var require_subset = __commonJS({
+  "node_modules/semver/ranges/subset.js"(exports2, module2) {
+    var Range = require_range();
+    var Comparator = require_comparator();
+    var { ANY } = Comparator;
+    var satisfies = require_satisfies();
+    var compare = require_compare();
+    var subset = (sub, dom, options = {}) => {
+      if (sub === dom) {
+        return true;
+      }
+      sub = new Range(sub, options);
+      dom = new Range(dom, options);
+      let sawNonNull = false;
+      OUTER: for (const simpleSub of sub.set) {
+        for (const simpleDom of dom.set) {
+          const isSub = simpleSubset(simpleSub, simpleDom, options);
+          sawNonNull = sawNonNull || isSub !== null;
+          if (isSub) {
+            continue OUTER;
+          }
+        }
+        if (sawNonNull) {
+          return false;
+        }
+      }
+      return true;
+    };
+    var minimumVersionWithPreRelease = [new Comparator(">=0.0.0-0")];
+    var minimumVersion = [new Comparator(">=0.0.0")];
+    var simpleSubset = (sub, dom, options) => {
+      if (sub === dom) {
+        return true;
+      }
+      if (sub.length === 1 && sub[0].semver === ANY) {
+        if (dom.length === 1 && dom[0].semver === ANY) {
+          return true;
+        } else if (options.includePrerelease) {
+          sub = minimumVersionWithPreRelease;
+        } else {
+          sub = minimumVersion;
+        }
+      }
+      if (dom.length === 1 && dom[0].semver === ANY) {
+        if (options.includePrerelease) {
+          return true;
+        } else {
+          dom = minimumVersion;
+        }
+      }
+      const eqSet = /* @__PURE__ */ new Set();
+      let gt, lt2;
+      for (const c of sub) {
+        if (c.operator === ">" || c.operator === ">=") {
+          gt = higherGT(gt, c, options);
+        } else if (c.operator === "<" || c.operator === "<=") {
+          lt2 = lowerLT(lt2, c, options);
+        } else {
+          eqSet.add(c.semver);
+        }
+      }
+      if (eqSet.size > 1) {
+        return null;
+      }
+      let gtltComp;
+      if (gt && lt2) {
+        gtltComp = compare(gt.semver, lt2.semver, options);
+        if (gtltComp > 0) {
+          return null;
+        } else if (gtltComp === 0 && (gt.operator !== ">=" || lt2.operator !== "<=")) {
+          return null;
+        }
+      }
+      for (const eq of eqSet) {
+        if (gt && !satisfies(eq, String(gt), options)) {
+          return null;
+        }
+        if (lt2 && !satisfies(eq, String(lt2), options)) {
+          return null;
+        }
+        for (const c of dom) {
+          if (!satisfies(eq, String(c), options)) {
+            return false;
+          }
+        }
+        return true;
+      }
+      let higher, lower;
+      let hasDomLT, hasDomGT;
+      let needDomLTPre = lt2 && !options.includePrerelease && lt2.semver.prerelease.length ? lt2.semver : false;
+      let needDomGTPre = gt && !options.includePrerelease && gt.semver.prerelease.length ? gt.semver : false;
+      if (needDomLTPre && needDomLTPre.prerelease.length === 1 && lt2.operator === "<" && needDomLTPre.prerelease[0] === 0) {
+        needDomLTPre = false;
+      }
+      for (const c of dom) {
+        hasDomGT = hasDomGT || c.operator === ">" || c.operator === ">=";
+        hasDomLT = hasDomLT || c.operator === "<" || c.operator === "<=";
+        if (gt) {
+          if (needDomGTPre) {
+            if (c.semver.prerelease && c.semver.prerelease.length && c.semver.major === needDomGTPre.major && c.semver.minor === needDomGTPre.minor && c.semver.patch === needDomGTPre.patch) {
+              needDomGTPre = false;
+            }
+          }
+          if (c.operator === ">" || c.operator === ">=") {
+            higher = higherGT(gt, c, options);
+            if (higher === c && higher !== gt) {
+              return false;
+            }
+          } else if (gt.operator === ">=" && !satisfies(gt.semver, String(c), options)) {
+            return false;
+          }
+        }
+        if (lt2) {
+          if (needDomLTPre) {
+            if (c.semver.prerelease && c.semver.prerelease.length && c.semver.major === needDomLTPre.major && c.semver.minor === needDomLTPre.minor && c.semver.patch === needDomLTPre.patch) {
+              needDomLTPre = false;
+            }
+          }
+          if (c.operator === "<" || c.operator === "<=") {
+            lower = lowerLT(lt2, c, options);
+            if (lower === c && lower !== lt2) {
+              return false;
+            }
+          } else if (lt2.operator === "<=" && !satisfies(lt2.semver, String(c), options)) {
+            return false;
+          }
+        }
+        if (!c.operator && (lt2 || gt) && gtltComp !== 0) {
+          return false;
+        }
+      }
+      if (gt && hasDomLT && !lt2 && gtltComp !== 0) {
+        return false;
+      }
+      if (lt2 && hasDomGT && !gt && gtltComp !== 0) {
+        return false;
+      }
+      if (needDomGTPre || needDomLTPre) {
+        return false;
+      }
+      return true;
+    };
+    var higherGT = (a, b, options) => {
+      if (!a) {
+        return b;
+      }
+      const comp = compare(a.semver, b.semver, options);
+      return comp > 0 ? a : comp < 0 ? b : b.operator === ">" && a.operator === ">=" ? b : a;
+    };
+    var lowerLT = (a, b, options) => {
+      if (!a) {
+        return b;
+      }
+      const comp = compare(a.semver, b.semver, options);
+      return comp < 0 ? a : comp > 0 ? b : b.operator === "<" && a.operator === "<=" ? b : a;
+    };
+    module2.exports = subset;
+  }
+});
+
+// node_modules/semver/index.js
+var require_semver2 = __commonJS({
+  "node_modules/semver/index.js"(exports2, module2) {
+    var internalRe = require_re();
+    var constants = require_constants();
+    var SemVer = require_semver();
+    var identifiers = require_identifiers();
+    var parse = require_parse();
+    var valid = require_valid();
+    var clean = require_clean();
+    var inc = require_inc();
+    var diff = require_diff();
+    var major = require_major();
+    var minor = require_minor();
+    var patch = require_patch();
+    var prerelease = require_prerelease();
+    var compare = require_compare();
+    var rcompare = require_rcompare();
+    var compareLoose = require_compare_loose();
+    var compareBuild = require_compare_build();
+    var sort = require_sort();
+    var rsort = require_rsort();
+    var gt = require_gt();
+    var lt2 = require_lt();
+    var eq = require_eq();
+    var neq = require_neq();
+    var gte = require_gte();
+    var lte = require_lte();
+    var cmp = require_cmp();
+    var coerce2 = require_coerce();
+    var Comparator = require_comparator();
+    var Range = require_range();
+    var satisfies = require_satisfies();
+    var toComparators = require_to_comparators();
+    var maxSatisfying = require_max_satisfying();
+    var minSatisfying = require_min_satisfying();
+    var minVersion2 = require_min_version();
+    var validRange = require_valid2();
+    var outside = require_outside();
+    var gtr = require_gtr();
+    var ltr = require_ltr();
+    var intersects = require_intersects();
+    var simplifyRange = require_simplify();
+    var subset = require_subset();
+    module2.exports = {
+      parse,
+      valid,
+      clean,
+      inc,
+      diff,
+      major,
+      minor,
+      patch,
+      prerelease,
+      compare,
+      rcompare,
+      compareLoose,
+      compareBuild,
+      sort,
+      rsort,
+      gt,
+      lt: lt2,
+      eq,
+      neq,
+      gte,
+      lte,
+      cmp,
+      coerce: coerce2,
+      Comparator,
+      Range,
+      satisfies,
+      toComparators,
+      maxSatisfying,
+      minSatisfying,
+      minVersion: minVersion2,
+      validRange,
+      outside,
+      gtr,
+      ltr,
+      intersects,
+      simplifyRange,
+      subset,
+      SemVer,
+      re: internalRe.re,
+      src: internalRe.src,
+      tokens: internalRe.t,
+      SEMVER_SPEC_VERSION: constants.SEMVER_SPEC_VERSION,
+      RELEASE_TYPES: constants.RELEASE_TYPES,
+      compareIdentifiers: identifiers.compareIdentifiers,
+      rcompareIdentifiers: identifiers.rcompareIdentifiers
+    };
   }
 });
 
@@ -15410,7 +16164,7 @@ async function replacePlaceholders(destDir, data) {
   console.log("Template placeholders replaced successfully.\n");
 }
 
-// ../DeskThing-Types/dist/apps/appData.js
+// ../deskthing-types/dist/apps/appData.js
 var PlatformTypes;
 (function(PlatformTypes2) {
   PlatformTypes2["WINDOWS"] = "windows";
@@ -15432,6 +16186,15 @@ var TagTypes;
   TagTypes2["AUDIO_AGENT"] = "audioagent";
 })(TagTypes || (TagTypes = {}));
 
+// ../deskthing-types/dist/plugins/pluginData.js
+var PluginApplications;
+(function(PluginApplications2) {
+  PluginApplications2["SERVER"] = "server";
+  PluginApplications2["ADB"] = "adb";
+  PluginApplications2["BLUETOOTH"] = "bluetooth";
+  PluginApplications2["CLIENT"] = "client";
+})(PluginApplications || (PluginApplications = {}));
+
 // src/view/appManifest.ts
 var import_valid = __toESM(require_valid());
 var import_valid2 = __toESM(require_valid2());
@@ -15444,7 +16207,7 @@ var import_meta = {};
 var defaultValues = {
   version: "0.11.5",
   compatible_client: "0.11.2",
-  compatible_server: "0.11.13"
+  compatible_server: "0.11.18"
 };
 function getPackagePath() {
   try {
@@ -15579,7 +16342,7 @@ async function startCreation(type) {
   try {
     const sourceDir = import_path2.default.join(
       __dirname,
-      import_path2.default.join("..", "template", type)
+      import_path2.default.join("..", "template", "app", type)
     );
     const rawProjectName = await esm_default5({
       message: "Enter App ID: ",
@@ -15795,6 +16558,7 @@ async function updateProject(options = { noOverwrite: false }) {
             __dirname,
             "..",
             "template",
+            "app",
             manifestObject.template || "full",
             file
           );
@@ -15940,6 +16704,310 @@ var findTypeScriptFiles = async (dir) => {
   return files;
 };
 
+// src/create/createPlugin.ts
+var import_promises4 = __toESM(require("fs/promises"));
+var import_path5 = __toESM(require("path"));
+var semver = __toESM(require_semver2());
+var import_valid4 = __toESM(require_valid());
+
+// src/update/updatePlugin.ts
+var import_path4 = __toESM(require("path"));
+var import_fs = require("fs");
+async function updatePluginManifest(pluginId) {
+  const pluginRoot = import_path4.default.join(process.cwd(), "plugins", pluginId);
+  const manifestPath = import_path4.default.join(pluginRoot, "manifest.json");
+  const manifest = await getJSON(manifestPath);
+  manifest.version = String(
+    await esm_default5({ message: "Plugin Version:", default: String(manifest.version || "") })
+  ).trim() || manifest.version;
+  manifest.label = String(
+    await esm_default5({ message: "Human-friendly label:", default: String(manifest.label || pluginId) })
+  ).trim();
+  manifest.description = String(
+    await esm_default5({ message: "Short description:", default: String(manifest.description || "") })
+  ).trim();
+  manifest.purpose = String(
+    await esm_default5({ message: "Purpose (one-line):", default: String(manifest.purpose || "") })
+  ).trim();
+  const req = Object.assign({}, manifest.required ?? {});
+  const reqKeys = ["server", "client", "app"];
+  for (const k of reqKeys) {
+    const current = String(req[k] ?? "");
+    const val = String(
+      await esm_default5({
+        message: `Minimum required version for ${k} (leave empty to remove):`,
+        default: current
+      })
+    ).trim();
+    if (val) {
+      req[k] = val;
+    } else {
+      delete req[k];
+    }
+  }
+  manifest.required = Object.keys(req).length ? req : {};
+  manifest.entrypoints = manifest.entrypoints ?? {};
+  for (const plugin of Object.values(PluginApplications)) {
+    const existing = manifest.entrypoints[plugin];
+    if (existing) {
+      const remove = await esm_default4({
+        message: `Entry point for ${plugin} exists (${existing.fileName}). Remove it?`,
+        default: false
+      });
+      if (remove) {
+        delete manifest.entrypoints[plugin];
+        continue;
+      }
+      const edit = await esm_default4({ message: `Edit entrypoint for ${plugin}?`, default: false });
+      if (edit) {
+        const fileName = String(
+          await esm_default5({
+            message: `File name for ${plugin}:`,
+            default: String(existing.fileName || "index.ts"),
+            validate: (v) => v && v.trim() ? true : "fileName is required"
+          })
+        ).trim();
+        const isRepeatable = !!await esm_default4({ message: `Is the ${plugin} plugin repeatable?`, default: !!existing.isRepeatable });
+        const persistent = !!await esm_default4({ message: `Is the ${plugin} plugin persistent?`, default: !!existing.persistent });
+        manifest.entrypoints[plugin] = { fileName, isRepeatable, persistent };
+        if (plugin === PluginApplications.CLIENT && "lazy" in existing) {
+          const lazy = !!await esm_default4({ message: "Load client entrypoint lazily?", default: !!existing.lazy });
+          manifest.entrypoints[plugin].lazy = lazy;
+        }
+      }
+    } else {
+      const add = await esm_default4({ message: `Add entrypoint for ${plugin}?`, default: false });
+      if (!add) continue;
+      const fileName = String(
+        await esm_default5({
+          message: `File name for ${plugin}:`,
+          default: "index.ts",
+          validate: (v) => v && v.trim() ? true : "fileName is required"
+        })
+      ).trim();
+      const isRepeatable = !!await esm_default4({ message: `Is the ${plugin} plugin repeatable?`, default: false });
+      const persistent = !!await esm_default4({ message: `Is the ${plugin} plugin persistent?`, default: false });
+      manifest.entrypoints[plugin] = { fileName, isRepeatable, persistent };
+      if (plugin === "client") {
+        const lazy = !!await esm_default4({ message: "Load client entrypoint lazily?", default: false });
+        manifest.entrypoints[plugin].lazy = lazy;
+      }
+    }
+  }
+  if (!manifest.entrypoints || Object.keys(manifest.entrypoints).length === 0) {
+    delete manifest.entrypoints;
+  }
+  await import_fs.promises.writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf8");
+}
+async function getJSON(manifestPath) {
+  try {
+    const content = await import_fs.promises.readFile(manifestPath, "utf8");
+    return JSON.parse(content);
+  } catch (err) {
+    throw new Error(`Failed to read/parse manifest at ${manifestPath}: ${err?.message ?? err}`);
+  }
+}
+
+// src/create/createPlugin.ts
+var import_meta2 = {};
+async function copyRecursive(src, dest) {
+  const st = await import_promises4.default.stat(src);
+  if (st.isDirectory()) {
+    await import_promises4.default.mkdir(dest, { recursive: true });
+    const entries = await import_promises4.default.readdir(src);
+    for (const e of entries) {
+      await copyRecursive(import_path5.default.join(src, e), import_path5.default.join(dest, e));
+    }
+  } else {
+    await import_promises4.default.mkdir(import_path5.default.dirname(dest), { recursive: true });
+    await import_promises4.default.copyFile(src, dest);
+  }
+}
+async function createPlugin() {
+  try {
+    const MIN_DESKTHING_VERSION = "0.11.18";
+    const PLUGIN_VERSION = "0.11.0";
+    const repoDeskthingManifest = import_path5.default.join(process.cwd(), "deskthing", "manifest.json");
+    let deskthingRaw;
+    try {
+      deskthingRaw = await import_promises4.default.readFile(repoDeskthingManifest, "utf8");
+    } catch (err) {
+      Logger.error(`Unable to read ${repoDeskthingManifest}: ${String(err)}`);
+      throw err;
+    }
+    let deskthingManifest;
+    try {
+      deskthingManifest = JSON.parse(deskthingRaw);
+    } catch {
+      throw new Error("deskthing/manifest.json is not valid JSON");
+    }
+    const dtRangeRaw = deskthingManifest.requiredVersions?.server;
+    const dtRange = String(dtRangeRaw ?? "");
+    if (!dtRange) {
+      throw new Error(`deskthing requiredVersions.server is missing (require >= ${MIN_DESKTHING_VERSION})`);
+    }
+    let minAllowed = semver.minVersion(dtRange);
+    if (!minAllowed) {
+      const coerced = semver.coerce(dtRange);
+      if (coerced) minAllowed = coerced;
+    }
+    if (!minAllowed) {
+      throw new Error(`Unable to determine minimum deskthing version from requiredVersions.server "${dtRangeRaw}"`);
+    }
+    if (semver.lt(minAllowed.version, MIN_DESKTHING_VERSION)) {
+      Logger.error(`Incompatible deskthing server version range "${dtRangeRaw}".`);
+      Logger.info('To fix, run "npx create-deskthing@latest --update" to update the deskthing server version.');
+      throw new Error(
+        `"${dtRangeRaw ?? "(missing)"}" allows versions as low as ${minAllowed.version} but plugin requires >= ${MIN_DESKTHING_VERSION}`
+      );
+    }
+    const rawName = await esm_default5({
+      message: "Plugin folder/id:",
+      validate: (v) => v && v.trim() ? true : "Name is required",
+      transformer: (v) => v.trim().toLowerCase().replace(/\s+/g, "-")
+    });
+    const name = rawName.trim().toLowerCase().replace(/\s+/g, "-");
+    Logger.info(`Creating plugin "${name}"...`);
+    const pluginRoot = import_path5.default.join(process.cwd(), "plugins", name);
+    try {
+      await import_promises4.default.stat(pluginRoot);
+      const edit = await esm_default4({ message: `Plugin "${name}" already exists. Do you want to edit it?`, default: false });
+      if (!edit) {
+        Logger.info(`Exiting without changes.`);
+        return;
+      }
+      return updatePluginManifest(name);
+    } catch (err) {
+      if (err?.code !== "ENOENT") {
+        Logger.error(`Failed to check plugin directory ${pluginRoot}:`, err);
+        throw err;
+      }
+    }
+    await validateProjectName(name, pluginRoot);
+    const pluginVersion = await esm_default5({
+      message: `Plugin Version (${MIN_DESKTHING_VERSION}):`,
+      default: MIN_DESKTHING_VERSION,
+      validate: (input) => {
+        Logger.info(`Creating plugin "${name}"...`);
+        const v = String(input || MIN_DESKTHING_VERSION).trim();
+        const valid = (0, import_valid4.default)(v);
+        return valid ? true : "Invalid semver version";
+      }
+    });
+    const labelResp = await esm_default5({ message: "Human-friendly label", default: name });
+    const descriptionResp = await esm_default5({ message: "Short description", default: "" });
+    const purposeResp = await esm_default5({ message: "Purpose (one-line)", default: "" });
+    const platformsResp = await esm_default2({
+      message: "Select target platforms",
+      instructions: "This is ",
+      required: true,
+      choices: [
+        { description: "Plugin runs on the Server and modifies server behavior (not implemented)", name: "Server", value: PluginApplications.SERVER },
+        { description: "Plugin runs on ADB-connected devices", name: "ADB", value: PluginApplications.ADB },
+        { description: "Plugin runs on any bluetooth device (not implemented)", name: "Bluetooth", value: PluginApplications.BLUETOOTH },
+        { description: "Plugin runs on any client (not implemented)", name: "Client", value: PluginApplications.CLIENT }
+      ]
+    });
+    const label = String(labelResp || name).trim();
+    const description = String(descriptionResp || "").trim();
+    const purpose = String(purposeResp || "").trim();
+    const platforms = platformsResp || [];
+    if (platforms.length === 0) {
+      throw new Error("At least one platform must be selected");
+    }
+    const entrypoints = {};
+    const required = {};
+    for (const p of platforms) {
+      const verResp = await esm_default5({
+        message: `Minimum required version for ${p} (semver, leave empty if none)`,
+        default: ""
+      });
+      const ver = String(verResp || "").trim();
+      if (ver) {
+        if (p === PluginApplications.SERVER) required.server = ver;
+        else if (p === PluginApplications.CLIENT) required.client = ver;
+        else required.app = required.app || ver;
+      }
+      const defaultFileName = `index.ts`;
+      const fileNameResp = await esm_default5({
+        message: `File name for ${p} (${defaultFileName}):`,
+        default: defaultFileName,
+        validate: (v) => v && v.trim() ? true : "fileName is required"
+      });
+      const fileName = String(fileNameResp || "").trim();
+      if (!fileName) throw new Error("Entrypoint fileName is required");
+      let lazy = false;
+      if (p === PluginApplications.CLIENT) {
+        lazy = !!await esm_default4({ message: "Load client entrypoint lazily?", default: false });
+      }
+      const isRepeatableResp = await esm_default4({
+        message: `Is the ${p} plugin repeatable (can run multiple times)?`,
+        default: false
+      });
+      const persistentResp = await esm_default4({
+        message: `Is the ${p} plugin persistent (only has to be run once)?`,
+        default: false
+      });
+      const isRepeatable = !!isRepeatableResp;
+      const persistent = !!persistentResp;
+      if (p === PluginApplications.SERVER) entrypoints.server = { fileName, isRepeatable, persistent };
+      else if (p === PluginApplications.ADB) entrypoints.adb = { fileName, isRepeatable, persistent };
+      else if (p === PluginApplications.BLUETOOTH) entrypoints.bluetooth = { fileName, isRepeatable, persistent };
+      else if (p === PluginApplications.CLIENT) entrypoints.client = { fileName, lazy, isRepeatable, persistent };
+    }
+    const manifest = {
+      version: pluginVersion,
+      plugin_version: PLUGIN_VERSION,
+      required: Object.keys(required).length ? required : {},
+      id: name,
+      entrypoints: Object.keys(entrypoints).length ? entrypoints : void 0,
+      label,
+      description,
+      purpose
+    };
+    Logger.info(`Creating plugin directory at ${pluginRoot}...`);
+    try {
+      await import_promises4.default.mkdir(pluginRoot, { recursive: true });
+    } catch (err) {
+      throw new Error(`Failed to create plugin directory ${pluginRoot}: ${String(err)}`);
+    }
+    const manifestPath = import_path5.default.join(pluginRoot, "manifest.json");
+    try {
+      await import_promises4.default.writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf8");
+    } catch (err) {
+      throw new Error(`Failed to write manifest.json: ${String(err)}`);
+    }
+    const baseDir = typeof __dirname !== "undefined" ? __dirname : import_path5.default.dirname(new URL(import_meta2.url).pathname);
+    for (const [k, v] of Object.entries(entrypoints)) {
+      const fileNameRel = v.fileName;
+      const fileNamePath = import_path5.default.join(pluginRoot, fileNameRel);
+      const fileNameDir = import_path5.default.dirname(fileNamePath);
+      const templatePath = import_path5.default.join(baseDir, "..", "template", "plugin", k);
+      try {
+        const st = await import_promises4.default.stat(templatePath);
+        if (st.isDirectory()) {
+          await copyRecursive(templatePath, fileNameDir);
+        } else {
+          await import_promises4.default.mkdir(fileNameDir, { recursive: true });
+          await import_promises4.default.copyFile(templatePath, fileNamePath);
+        }
+      } catch (err) {
+        await import_promises4.default.mkdir(fileNameDir, { recursive: true });
+        const placeholder = `// Placeholder entrypoint for ${k}
+module.exports = async function() {
+  console.log('Running plugin ${name} for ${k}');
+};
+`;
+        await import_promises4.default.writeFile(fileNamePath, placeholder, "utf8");
+      }
+    }
+    Logger.success(`Plugin scaffold created at ${pluginRoot}`);
+  } catch (err) {
+    Logger.error("Failed to create plugin template:", err);
+    throw err;
+  }
+}
+
 // src/index.ts
 var rl = import_readline.default.createInterface({
   input: process.stdin,
@@ -15947,7 +17015,8 @@ var rl = import_readline.default.createInterface({
 });
 var args = process.argv.slice(2);
 var isUpdate = args.includes("--update");
-var isCreate = args.includes("--create");
+var isCreate = args.includes("--create") || !args.includes("--plugin");
+var isCreatePlugin = args.includes("--plugin");
 var isCreateMin = isCreate && args.includes("min");
 var isCreateFull = isCreate && args.includes("full");
 var isHelp = isCreate && args.includes("--help");
@@ -15987,6 +17056,11 @@ async function init() {
     if (isCreate) {
       Logger.info("Creating base template...");
       await startCreation("base");
+      return;
+    }
+    if (isCreatePlugin) {
+      Logger.info("Creating plugin template...");
+      await createPlugin();
       return;
     }
     Logger.header(`Welcome to the DeskThing Template Engine v${version}`);

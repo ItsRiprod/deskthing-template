@@ -2,7 +2,7 @@
   "name": "create-deskthing",
   "private": false,
   "version": "0.11.5",
-  "compatible_server": "0.11.13",
+  "compatible_server": "0.11.18",
   "compatible_client": "0.11.2",
   "type": "commonjs",
   "description": "The DeskThing template for building DeskThing Apps",

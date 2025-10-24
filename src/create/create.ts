@@ -14,7 +14,7 @@ export async function startCreation(type: string): Promise<void> {
   try {
     const sourceDir: string = path.join(
       __dirname,
-      path.join("..", "template", type)
+      path.join("..", "template", "app", type)
     );
     const rawProjectName = await input({
       message: "Enter App ID: ",
